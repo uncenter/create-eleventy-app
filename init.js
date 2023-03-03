@@ -17,9 +17,14 @@ export function addAllPlugins(plugins, markdownPlugins) {
 };
 
 export function setupAllPlugins(plugins, markdownPlugins) {
+    const pluginOptions = JSON.parse(fs.readFileSync("./lib/src/plugins/eleventy.json", "utf8"));
     let pluginsString = "";
     for (let plugin of plugins) {
-        pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))});\n`;
+        if (pluginOptions[plugin].options) {
+            pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, ${JSON.stringify(pluginOptions[plugin].options)});\n`;
+        } else {
+            pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))});\n`;
+        }
     }
     let markdownPluginsString = `
     const mdLib = markdownIt({
@@ -28,9 +33,11 @@ export function setupAllPlugins(plugins, markdownPlugins) {
         linkify: true,
     })\n`;
     for (let markdownPlugin of markdownPlugins) {
-        markdownPluginsString += `.use(${deslugify(splitPath(markdownPlugin))})`;
+        markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))})`;
         if (markdownPlugin === markdownPlugins[markdownPlugins.length - 1]) {
             markdownPluginsString += ";\n";
+        } else {
+            markdownPluginsString += "\n";
         }
     }
     return pluginsString + markdownPluginsString + `\televentyConfig.setLibrary("md", mdLib);\n`
@@ -55,7 +62,6 @@ export function generateProject(answers) {
     const { name, configuration, plugins, markdownPlugins, pages, properties } = answers;
     const project = slugify(name);
     const inputDir = path.join(project, properties.input);
-    console.log(project);
     fs.mkdirSync(project);
     fs.mkdirSync(inputDir);
     const dirs = [properties.data, properties.includes];

@@ -1,0 +1,58 @@
+{
+    "markdownItAnchor": {
+        "options": {
+            "permalink": {
+                "markdownItAnchor.permalink.ariaHidden": {
+                    "placement": "after",
+                    "class": "header-anchor",
+                    "symbol": "#",
+                    "ariaHidden": false
+                }
+            },
+            "level": [1, 2, 3, 4],
+            "slugify": "slugify"
+        }
+    },
+    "markdownItEmoji": {
+        "options": {}
+    },
+    "markdownItFootnote": {
+        "options": {}
+    },
+    "markdownItKBD": {
+        "options": {}
+    },
+    "markdownItLinkAttributes": {
+        "options": {
+            "matcher": "matcher",
+            "attrs": {
+                "target": "_blank",
+                "rel": "noopener noreferrer"
+            }
+        }
+    },
+    "markdownItSub": {
+        "options": {}
+    },
+    "markdownItSup": {
+        "options": {}
+    },
+    "markdownItChecklist": {
+        "options": {
+            "disabled": true,
+            "divWrap": false,
+            "idPrefix": "",
+            "ulClass": "checklist",
+            "liClass": "checklist-item"
+        }
+    },
+    "markdownItAbbr": {
+        "options": {}
+    },
+    "markdownItMark": {
+        "options": {}
+    },
+    "markdownItAttrs": {
+        "options": {}
+    }
+}

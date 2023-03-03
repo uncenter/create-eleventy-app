@@ -94,16 +94,17 @@ async function run() {
         ]);
     }
 
+    const plugins = JSON.parse(
+        fs.readFileSync("./lib/src/plugins/eleventy.json", "utf8")
+    );
+    const pluginChoices = Object.keys(plugins).map((plugin) => {
+        return { name: plugin };
+    });
     const pluginsAnswer = await inquirer.prompt({
         type: "checkbox",
         name: "plugins",
         message: "What plugins would you like to use?",
-        choices: [
-            { name: "eleventy-plugin-rss", checked: true },
-            { name: "eleventy-plugin-syntaxhighlight" },
-            { name: "eleventy-plugin-toc" },
-            { name: "eleventy-plugin-external-links" },
-        ],
+        choices: pluginChoices,
     });
 
     const markdownPluginsAnswer = await inquirer.prompt({
