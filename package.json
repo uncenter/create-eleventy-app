@@ -1,0 +1,8 @@
+{
+    "type": "module",
+    "exports": "./index.js",
+    "dependencies": {
+        "fs": "^0.0.1-security",
+        "inquirer": "^9.1.4"
+    }
+}
