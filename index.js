@@ -1,12 +1,23 @@
 import inquirer from "inquirer";
 import fs from "fs";
-import { createConfigFile } from "./helpers.js";
+import { generateProject } from "./init.js";
+import { slugify } from "./utils.js";
 
 async function run() {
     const projectNameAnswer = await inquirer.prompt({
         type: "input",
         name: "projectName",
         message: "What is your project named?",
+        default: "Eleventy Starter",
+        validate: (input) => {
+            if (fs.existsSync(slugify(input))) {
+                return "A project with that name already exists.";
+            }
+            if (input.trim() === "") {
+                return "Please enter a project name.";
+            }
+            return true;
+        },
     });
 
     const configurationAnswer = await inquirer.prompt({
@@ -19,6 +30,7 @@ async function run() {
             "Base + Tailwind",
             "Base + Tailwind + Sass",
         ],
+        default: "Base",
     });
 
     const customOrPacksAnswer = await inquirer.prompt({
@@ -28,21 +40,20 @@ async function run() {
         choices: ["Packs", "Custom"],
     });
 
-    let addonsAnswer;
+    let packsAnswer;
     if (customOrPacksAnswer.customOrPacks === "Packs") {
-        addonsAnswer = await inquirer.prompt({
+        packsAnswer = await inquirer.prompt({
             type: "checkbox",
             name: "addons",
-            message: "What filter packs would you like to use?",
+            message: "What packs would you like to use?",
             choices: [
-                { name: "Blog", checked: true },
+                { name: "Blog Tools", checked: true },
                 { name: "Comments" },
-                { name: "Dates" },
-                { name: "None" },
+                { name: "Date Tools" },
             ],
         });
     } else {
-        addonsAnswer = await inquirer.prompt([
+        packsAnswer = await inquirer.prompt([
             {
                 type: "checkbox",
                 name: "filters",
@@ -50,7 +61,6 @@ async function run() {
                 choices: [
                     { name: "readingTime", checked: true },
                     { name: "readableDate" },
-                    { name: "..." },
                     { name: "None" },
                 ],
             },
@@ -61,7 +71,6 @@ async function run() {
                 choices: [
                     { name: "note", checked: true },
                     { name: "image" },
-                    { name: "..." },
                     { name: "None" },
                 ],
             },
@@ -71,9 +80,6 @@ async function run() {
                 message: "What collections would you like to use?",
                 choices: [
                     { name: "posts", checked: true },
-                    { name: "tags" },
-                    { name: "..." },
-                    { name: "None" },
                 ],
             },
             {
@@ -83,8 +89,6 @@ async function run() {
                 choices: [
                     { name: "minify (production only)", checked: true },
                     { name: "prettify (production only)" },
-                    { name: "..." },
-                    { name: "None" },
                 ],
             },
         ]);
@@ -99,8 +103,6 @@ async function run() {
             { name: "eleventy-plugin-syntaxhighlight" },
             { name: "eleventy-plugin-toc" },
             { name: "eleventy-plugin-external-links" },
-            { name: "..." },
-            { name: "None" },
         ],
     });
 
@@ -113,8 +115,6 @@ async function run() {
             { name: "markdown-it-attrs" },
             { name: "markdown-it-emoji" },
             { name: "markdown-it-footnote" },
-            { name: "..." },
-            { name: "None" },
         ],
     });
 
@@ -125,7 +125,6 @@ async function run() {
         choices: [
             { name: "Blog", checked: true },
             { name: "Tags" },
-            { name: "None" },
         ],
     });
 
@@ -184,17 +183,20 @@ async function run() {
     const installAnswer = await inquirer.prompt({
         type: "confirm",
         name: "install",
-        message: "Install dependencies and initialize?",
+        message: "Install dependencies?",
     });
 
-    fs.mkdirSync(projectNameAnswer.projectName);
-    fs.mkdirSync(`${projectNameAnswer.projectName}/${advancedConfiguration.input}`);
-    fs.mkdirSync(`${projectNameAnswer.projectName}/${advancedConfiguration.input}/${advancedConfiguration.includes}`);
-    fs.mkdirSync(`${projectNameAnswer.projectName}/${advancedConfiguration.input}/${advancedConfiguration.data}`);
-    fs.writeFile(`${projectNameAnswer.projectName}/${advancedConfiguration.configFile}`, createConfigFile(pluginsAnswer, markdownPluginsAnswer, addonsAnswer, advancedConfiguration), function (err) {
-        if (err) throw err;
-    }); 
-
+    const answers = {
+        name: projectNameAnswer.projectName,
+        configuration: configurationAnswer.configuration,
+        packs: packsAnswer.packs,
+        plugins: pluginsAnswer.plugins,
+        markdownPlugins: markdownPluginsAnswer.markdownPlugins,
+        pages: pagesAnswer.pages,
+        properties: advancedConfiguration,
+        install: installAnswer.install,
+    };
+    generateProject(answers);
 };
 
 run();
