@@ -4,22 +4,30 @@ A CLI tool to create a new Eleventy site.
 
 ## To-do
 
-### Templates
+### "Framework" configuration
 
-- [ ] Base
-- [ ] Base + Sass
-- [ ] Base + Tailwind
-- [ ] Base + Tailwind + Sass
+- [ ] None
+- [ ] Sass
+- [ ] Tailwind
+- [ ] Tailwind + Sass
 
 ### Addons
 
-#### Packs
+#### Bundles
 - [ ] Blog
 - [ ] Comments
 - [ ] Dates
 
-#### Templates
-- [ ] Blog
+#### Custom
+
+- [ ] Filters
+- [ ] Shortcodes
+- [ ] Collections
+
+### Pages
+
+- [ ] Blog posts list
+- [ ] Blog post
 
 ---
 

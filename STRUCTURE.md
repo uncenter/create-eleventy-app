@@ -6,104 +6,23 @@ npx create-eleventy-app
 
 ## Steps
 
-### 1. Create project directory
+### 1. Create project
 
 ```sh
 ? What is your project named? › <project-name>
 ```
 
-### 2. Select configuration 
+### 2. Select framework configuration 
 
-```sh
-? What configuration would you like to use? › (Use arrow keys)
-❯ Base
-  Base + Sass
-  Base + Tailwind
-  Base + Tailwind + Sass
-```
+### NaN. Select bundles or custom
 
-### NaN. Packs or custom?
+### 3(a). Add bundles
 
-```sh
-? What configuration would you like to use? › (Use arrow keys)
-❯ Packs
-  Custom
-```
-
-### 3(p). Select addons
-
-```sh
-? What filter packs would you like to use? › (Use arrow keys)
-❯ ◯ Blog
-  ◯ Comments
-  ◯ Dates
-  ◯ None
-```
-
-### 3(c). Select addons
-
-```sh
-? What filters would you like to use? › (Use arrow keys)
-❯ ◯ readingTime
-  ◯ readableDate
-  ◯ ...
-  ◯ None
-```
-
-```sh
-? What shortcodes would you like to use? › (Use arrow keys)
-❯ ◯ note
-  ◯ image
-  ◯ ...
-  ◯ None
-```
-
-```sh
-? What collections would you like to use? › (Use arrow keys)
-❯ ◯ posts
-  ◯ tags
-  ◯ ...
-  ◯ None
-```
-
-```sh
-? What transforms would you like to use? › (Use arrow keys)
-❯ ◯ minify (production only)
-  ◯ prettify (production only)
-  ◯ ...
-  ◯ None
-```
+### 3(b). Select customizations
 
 ### 4. Select plugins
 
-```sh
-? What plugins would you like to use? › (Use arrow keys)
-❯ ◯ eleventy-plugin-rss
-  ◯ eleventy-plugin-syntaxhighlight
-  ◯ eleventy-plugin-toc
-  ◯ eleventy-plugin-external-links
-  ◯ ...
-  ◯ None
-```
-
-```sh
-? What Markdown plugins would you like to use? › (Use arrow keys)
-❯ ◯ markdown-it-anchor
-  ◯ markdown-it-attrs
-  ◯ markdown-it-emoji
-  ◯ markdown-it-footnote
-  ◯ ...
-  ◯ None
-```
-
-### 5. Select pages
-
-```sh
-? What pages would you like to use? › (Use arrow keys)
-❯ ◯ Blog
-  ◯ Tags
-  ◯ None
-```
+### 5. Add pages
 
 ### 6. Advanced configuration or defaults
 
@@ -129,12 +48,6 @@ npx create-eleventy-app
 
 ```sh
 ? Set includes directory? › *_includes*
-```
-
-### 7. Install dependencies
-
-```sh
-? Install dependencies and initialize? › y/N
 ```
 
 Installs dependencies and initializes the project with `npm init`.
