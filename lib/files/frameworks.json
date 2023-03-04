@@ -1,0 +1,11 @@
+{
+    "tailwindcss": {
+        "config": "./tailwind.config.js"
+    },
+    "postcss": {
+        "config": "./postcss.config.js"
+    },
+    "sass": {
+        "plugin": "eleventy-plugin-sass"
+    }
+}

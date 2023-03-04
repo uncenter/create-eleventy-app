@@ -37,7 +37,7 @@ async function createSite() {
         type: "confirm",
         name: "answer",
         message: "Would you like to use a starter bundle?",
-        default: false,
+        default: true,
     });
 
     let bundles;
@@ -46,11 +46,7 @@ async function createSite() {
             type: "checkbox",
             name: "bundles",
             message: "What packs would you like to use?",
-            choices: [
-                { name: "Blog Tools" },
-                { name: "Comments" },
-                { name: "Date Tools" },
-            ],
+            choices: generateOptions("./lib/addons/bundles/")
         });
     } else {
         bundles = await inquirer.prompt([
@@ -58,37 +54,20 @@ async function createSite() {
                 type: "checkbox",
                 name: "filters",
                 message: "What filters would you like to use?",
-                choices: [
-                    { name: "readingTime" },
-                    { name: "readableDate" },
-                ],
+                choices: generateOptions("./lib/addons/filters/")
             },
             {
                 type: "checkbox",
                 name: "shortcodes",
                 message: "What shortcodes would you like to use?",
-                choices: [
-                    { name: "note" },
-                    { name: "image" },
-                ],
+                choices: generateOptions("./lib/addons/shortcodes/")
             },
             {
                 type: "checkbox",
                 name: "collections",
                 message: "What collections would you like to use?",
-                choices: [
-                    { name: "posts" },
-                ],
-            },
-            {
-                type: "checkbox",
-                name: "transforms",
-                message: "What transforms would you like to use?",
-                choices: [
-                    { name: "Minify (production only)" },
-                    { name: "Prettify (production only)" },
-                ],
-            },
+                choices: generateOptions("./lib/addons/collections/")
+            }
         ]);
     }
 
@@ -96,30 +75,28 @@ async function createSite() {
         type: "checkbox",
         name: "selected",
         message: "What plugins would you like to use?",
-        choices: generateOptions("./lib/src/plugins/eleventy.json"),
+        choices: generateOptions("./lib/plugins/eleventy.json"),
     });
 
     const markdownPlugins = await inquirer.prompt({
         type: "checkbox",
         name: "selected",
         message: "What Markdown plugins would you like to use?",
-        choices: generateOptions("./lib/src/plugins/markdown.json"),
+        choices: generateOptions("./lib/plugins/markdown.json"),
     });
 
     const pages = await inquirer.prompt({
         type: "checkbox",
         name: "selected",
         message: "What pages would you like to add?",
-        choices: [
-            { name: "Blog", checked: true },
-            { name: "Tags" },
-        ],
+        choices: generateOptions("./lib/files/pages/"),
     });
 
     const advancedOrDefaults = await inquirer.prompt({
         type: "confirm",
         name: "answer",
         message: "Advanced configuration?",
+        default: false,
     });
 
     let properties = {};
@@ -128,7 +105,7 @@ async function createSite() {
             {
                 type: "list",
                 name: "configFile",
-                message: "Rename Eleventy config file?",
+                message: "Set Eleventy config file path?",
                 choices: ["eleventy.config.js", "eleventy.config.cjs", ".eleventy.js"],
                 default: "eleventy.config.js",
             },
