@@ -1,9 +1,14 @@
 import inquirer from "inquirer";
 import fs from "fs";
+import chalk from "chalk";
 import { generateProject } from "./init.js";
 import { slugify, generateOptions } from "./utils.js";
 
 async function createSite() {
+    console.log(chalk.blue("\nWelcome to", chalk.underline.bold("create-eleventy-site") + "!"));
+    console.log(`\nTo get started, please answer the following questions (you can always change these settings later).\nIf you are unsure about any of the questions, you can press ${chalk.inverse("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
+
+
     const project = await inquirer.prompt({
         type: "input",
         name: "name",
@@ -23,7 +28,7 @@ async function createSite() {
     const frameworkConfiguration = await inquirer.prompt({
         type: "list",
         name: "answer",
-        message: "What framework configuration would you like to use?",
+        message: "Would you like to add a framework?",
         choices: [
             "None",
             "Sass",
@@ -40,62 +45,61 @@ async function createSite() {
         default: true,
     });
 
-    let bundles;
     if (customOrStarter.answer) {
-        bundles = await inquirer.prompt({
+        const bundles = await inquirer.prompt({
             type: "checkbox",
-            name: "bundles",
-            message: "What packs would you like to use?",
+            name: "selected",
+            message: "What bundles would you like to use?",
             choices: generateOptions("./lib/addons/bundles/")
         });
     } else {
-        bundles = await inquirer.prompt([
+        const customizations = await inquirer.prompt([
             {
                 type: "checkbox",
                 name: "filters",
                 message: "What filters would you like to use?",
-                choices: generateOptions("./lib/addons/filters/")
+                choices: generateOptions("./lib/addons/filters/"),
+                loop: false,
             },
             {
                 type: "checkbox",
                 name: "shortcodes",
                 message: "What shortcodes would you like to use?",
-                choices: generateOptions("./lib/addons/shortcodes/")
+                choices: generateOptions("./lib/addons/shortcodes/"),
+                loop: false,
             },
             {
                 type: "checkbox",
                 name: "collections",
                 message: "What collections would you like to use?",
-                choices: generateOptions("./lib/addons/collections/")
+                choices: generateOptions("./lib/addons/collections/"),
+                loop: false,
+            },
+            {
+                type: "checkbox",
+                name: "eleventyPlugins",
+                message: "What plugins would you like to use?",
+                choices: generateOptions("./lib/plugins/eleventy.json"),
+            },
+            {
+                type: "checkbox",
+                name: "markdownPlugins",
+                message: "What Markdown plugins would you like to use?",
+                choices: generateOptions("./lib/plugins/markdown.json"),
+            },
+            {
+                type: "checkbox",
+                name: "pages",
+                message: "What page templates would you like to add?",
+                choices: generateOptions("./lib/files/pages/"),
             }
         ]);
     }
 
-    const eleventyPlugins = await inquirer.prompt({
-        type: "checkbox",
-        name: "selected",
-        message: "What Eleventy plugins would you like to use?",
-        choices: generateOptions("./lib/plugins/eleventy.json"),
-    });
-
-    const markdownPlugins = await inquirer.prompt({
-        type: "checkbox",
-        name: "selected",
-        message: "What Markdown plugins would you like to use?",
-        choices: generateOptions("./lib/plugins/markdown.json"),
-    });
-
-    const pages = await inquirer.prompt({
-        type: "checkbox",
-        name: "selected",
-        message: "What pages would you like to add?",
-        choices: generateOptions("./lib/files/pages/"),
-    });
-
     const advancedOrDefaults = await inquirer.prompt({
         type: "confirm",
         name: "answer",
-        message: "Advanced configuration?",
+        message: "Configure advanced properties?",
         default: false,
     });
 
@@ -147,13 +151,13 @@ async function createSite() {
     const answers = {
         name: project.name,
         framework: frameworkConfiguration.answer,
-        bundles: bundles.bundles,
-        filters: bundles.filters,
-        shortcodes: bundles.shortcodes,
-        collections: bundles.collections,
-        eleventyPlugins: eleventyPlugins.selected,
-        markdownPlugins: markdownPlugins.selected,
-        pages: pages.selected,
+        bundles: bundles.selected,
+        filters: customizations.filters,
+        shortcodes: customizations.shortcodes,
+        collections: customizations.collections,
+        eleventyPlugins: customizations.eleventyPlugins,
+        markdownPlugins: customizations.markdownPlugins,
+        pages: customizations.pages,
         properties: properties
     };
     generateProject(answers);
