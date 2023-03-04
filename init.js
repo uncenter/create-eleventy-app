@@ -2,6 +2,7 @@ import { slugify, deslugify, splitPath } from "./utils.js";
 import fs from "fs";
 import path from "path";
 import beautify from "js-beautify";
+import chalk from "chalk";
 
 export function addAllPlugins(plugins, markdownPlugins) {
     function addPlugin(plugin) {
@@ -68,17 +69,19 @@ export function generateProject(answers) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
     const projectDirectory = slugify(name);
     const inputDirectory = path.join(projectDirectory, properties.input);
-    console.log(`\nGenerating project in \x1b[32m${path.resolve(projectDirectory)}\x1b[0m.`);
+    console.log(`\nGenerating project in ${chalk.blue(path.resolve(projectDirectory))}.`);
     fs.mkdirSync(projectDirectory);
+    console.log(`- ${chalk.dim(projectDirectory)}`);
     fs.mkdirSync(inputDirectory);
-    console.log("\nEleventy directories generated:");
+    console.log(`- ${chalk.dim(inputDirectory)}`);
     const dirs = [properties.data, properties.includes];
     dirs.forEach((dir) => {
         fs.mkdirSync(path.join(inputDirectory, dir));
-        console.log(`- \x1b[32m${path.join(projectDirectory, properties.input, dir)}\x1b[0m`);
+        console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
     });
     fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
-    console.log(`\nConfig file generated in \x1b[32m${path.resolve(projectDirectory, properties.configFile)}\x1b[0m.`);
+    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
+    console.log(`\n${chalk.green("Success!")} Project generated successfully!`);
 };

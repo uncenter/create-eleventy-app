@@ -2,6 +2,7 @@
     "type": "module",
     "exports": "./index.js",
     "dependencies": {
+        "chalk": "^5.2.0",
         "fs": "^0.0.1-security",
         "inquirer": "^9.1.4",
         "js-beautify": "^1.14.7",
