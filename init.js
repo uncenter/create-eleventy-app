@@ -68,18 +68,17 @@ export function generateProject(answers) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
     const projectDirectory = slugify(name);
     const inputDirectory = path.join(projectDirectory, properties.input);
-    console.log("Generating Eleventy project in " + "\x1b[31m" + __dirname + "/" + projectDirectory + "\x1b[0m" + ".");
+    console.log(`Generating Eleventy project in \x1b[31m${path.join(__dirname, projectDirectory)}\x1b[0m.`);
     fs.mkdirSync(projectDirectory);
     fs.mkdirSync(inputDirectory);
-    console.log("Eleventy directories generated:\n" + "\x1b[31m");
+    console.log("Eleventy directories generated:");
     const dirs = [properties.data, properties.includes];
     dirs.forEach((dir) => {
         fs.mkdirSync(path.join(inputDirectory, dir));
-        console.log(`- ${__dirname}/${projectDirectory}/${properties.input}/${dir}`);
+        console.log(`- \n\x1b[31m${path.join(__dirname, projectDirectory, properties.input, dir)}\x1b[0m`);
     });
-    console.log("\x1b[0m");
     fs.writeFile(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
-    console.log(`Eleventy configuration file generated in \x1b[31m${__dirname}/${projectDirectory}/${properties.configFile}.\x1b[0m`);
+    console.log(`Eleventy configuration file generated in \x1b[31m${path.join(__dirname, projectDirectory, properties.configFile)}\x1b[0m.`);
 };
