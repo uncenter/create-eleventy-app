@@ -45,15 +45,19 @@ async function createSite() {
         default: true,
     });
 
+    let bundles;
+    let customizations;
     if (customOrStarter.answer) {
-        const bundles = await inquirer.prompt({
+        bundles = await inquirer.prompt({
             type: "checkbox",
             name: "selected",
             message: "What bundles would you like to use?",
             choices: generateOptions("./lib/addons/bundles/")
         });
+        customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
     } else {
-        const customizations = await inquirer.prompt([
+        bundles = { selected: [] };
+        customizations = await inquirer.prompt([
             {
                 type: "checkbox",
                 name: "filters",
