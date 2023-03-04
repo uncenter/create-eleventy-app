@@ -1,7 +1,14 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import { generateProject } from "./init.js";
-import { slugify } from "./utils.js";
+import { deslugify, slugify } from "./utils.js";
+
+const generateOptions = (path) => {
+    const items = JSON.parse(fs.readFileSync(path, "utf8"));
+    return Object.keys(items).map((item) => {
+        return { name: deslugify(item) };
+    });
+};
 
 async function run() {
     const projectNameAnswer = await inquirer.prompt({
@@ -47,7 +54,7 @@ async function run() {
             name: "addons",
             message: "What packs would you like to use?",
             choices: [
-                { name: "Blog Tools", checked: true },
+                { name: "Blog Tools" },
                 { name: "Comments" },
                 { name: "Date Tools" },
             ],
@@ -59,9 +66,8 @@ async function run() {
                 name: "filters",
                 message: "What filters would you like to use?",
                 choices: [
-                    { name: "readingTime", checked: true },
+                    { name: "readingTime" },
                     { name: "readableDate" },
-                    { name: "None" },
                 ],
             },
             {
@@ -69,9 +75,8 @@ async function run() {
                 name: "shortcodes",
                 message: "What shortcodes would you like to use?",
                 choices: [
-                    { name: "note", checked: true },
+                    { name: "note" },
                     { name: "image" },
-                    { name: "None" },
                 ],
             },
             {
@@ -79,7 +84,7 @@ async function run() {
                 name: "collections",
                 message: "What collections would you like to use?",
                 choices: [
-                    { name: "posts", checked: true },
+                    { name: "posts" },
                 ],
             },
             {
@@ -87,36 +92,25 @@ async function run() {
                 name: "transforms",
                 message: "What transforms would you like to use?",
                 choices: [
-                    { name: "minify (production only)", checked: true },
-                    { name: "prettify (production only)" },
+                    { name: "Minify (production only)" },
+                    { name: "Prettify (production only)" },
                 ],
             },
         ]);
     }
 
-    const plugins = JSON.parse(
-        fs.readFileSync("./lib/src/plugins/eleventy.json", "utf8")
-    );
-    const pluginChoices = Object.keys(plugins).map((plugin) => {
-        return { name: plugin };
-    });
     const pluginsAnswer = await inquirer.prompt({
         type: "checkbox",
         name: "plugins",
         message: "What plugins would you like to use?",
-        choices: pluginChoices,
+        choices: generateOptions("./lib/src/plugins/eleventy.json"),
     });
 
     const markdownPluginsAnswer = await inquirer.prompt({
         type: "checkbox",
         name: "markdownPlugins",
         message: "What Markdown plugins would you like to use?",
-        choices: [
-            { name: "markdown-it-anchor", checked: true },
-            { name: "markdown-it-attrs" },
-            { name: "markdown-it-emoji" },
-            { name: "markdown-it-footnote" },
-        ],
+        choices: generateOptions("./lib/src/plugins/markdown.json"),
     });
 
     const pagesAnswer = await inquirer.prompt({
