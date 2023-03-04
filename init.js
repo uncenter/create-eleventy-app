@@ -20,12 +20,13 @@ export function setupAllPlugins(plugins, markdownPlugins) {
     const pluginOptions = JSON.parse(fs.readFileSync("./lib/src/plugins/eleventy.json", "utf8"));
     let pluginsString = "";
     for (let plugin of plugins) {
-        if (pluginOptions[plugin].options) {
-            pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, ${JSON.stringify(pluginOptions[plugin].options)});\n`;
+        if (pluginOptions[plugin].options !== "") {
+            pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, { ${pluginOptions[plugin].options} });\n`;
         } else {
             pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))});\n`;
         }
     }
+    const markdownPluginOptions = JSON.parse(fs.readFileSync("./lib/src/plugins/markdown.json", "utf8"));
     let markdownPluginsString = `
     const mdLib = markdownIt({
         html: true,
@@ -33,7 +34,11 @@ export function setupAllPlugins(plugins, markdownPlugins) {
         linkify: true,
     })\n`;
     for (let markdownPlugin of markdownPlugins) {
-        markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))})`;
+        if (markdownPluginOptions[markdownPlugin].options !== "") {
+            markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))}, { ${markdownPluginOptions[markdownPlugin].options} })`;
+        } else {
+            markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))})`;
+        }
         if (markdownPlugin === markdownPlugins[markdownPlugins.length - 1]) {
             markdownPluginsString += ";\n";
         } else {

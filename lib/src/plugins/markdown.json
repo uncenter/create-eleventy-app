@@ -1,58 +1,35 @@
 {
-    "markdownItAnchor": {
-        "options": {
-            "permalink": {
-                "markdownItAnchor.permalink.ariaHidden": {
-                    "placement": "after",
-                    "class": "header-anchor",
-                    "symbol": "#",
-                    "ariaHidden": false
-                }
-            },
-            "level": [1, 2, 3, 4],
-            "slugify": "slugify"
-        }
+    "markdown-it-anchor": {
+        "options": "permalink: markdownItAnchor.permalink.ariaHidden({ placement: 'after', class: 'header-anchor', symbol: '#', ariaHidden: false, }), level: [1, 2, 3, 4], slugify: eleventyConfig.getFilter('slugify')"
     },
-    "markdownItEmoji": {
-        "options": {}
+    "markdown-it-emoji": {
+        "options": ""
     },
-    "markdownItFootnote": {
-        "options": {}
+    "markdown-it-footnote": {
+        "options": ""
     },
-    "markdownItKBD": {
-        "options": {}
+    "markdown-it-kbd": {
+        "options": ""
     },
-    "markdownItLinkAttributes": {
-        "options": {
-            "matcher": "matcher",
-            "attrs": {
-                "target": "_blank",
-                "rel": "noopener noreferrer"
-            }
-        }
+    "markdown-it-link-attributes": {
+        "options": "attrs: { target: '_blank', rel: 'noopener noreferrer' }"
     },
-    "markdownItSub": {
-        "options": {}
+    "markdown-it-sub": {
+        "options": ""
     },
-    "markdownItSup": {
-        "options": {}
+    "markdown-it-sup": {
+        "options": ""
     },
-    "markdownItChecklist": {
-        "options": {
-            "disabled": true,
-            "divWrap": false,
-            "idPrefix": "",
-            "ulClass": "checklist",
-            "liClass": "checklist-item"
-        }
+    "markdown-it-checklist": {
+        "options": "disabled: true, divWrap: false, idPrefix: '', ulClass: 'checklist', liClass: 'checklist-item'"
     },
-    "markdownItAbbr": {
-        "options": {}
+    "markdown-it-abbr": {
+        "options": ""
     },
-    "markdownItMark": {
-        "options": {}
+    "markdown-it-mark": {
+        "options": ""
     },
-    "markdownItAttrs": {
-        "options": {}
+    "markdown-it-attrs": {
+        "options": ""
     }
 }
