@@ -1,16 +1,9 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import { generateProject } from "./init.js";
-import { deslugify, slugify } from "./utils.js";
+import { slugify, generateOptions } from "./utils.js";
 
-const generateOptions = (path) => {
-    const items = JSON.parse(fs.readFileSync(path, "utf8"));
-    return Object.keys(items).map((item) => {
-        return { name: deslugify(item) };
-    });
-};
-
-async function run() {
+async function createSite() {
     const projectNameAnswer = await inquirer.prompt({
         type: "input",
         name: "projectName",
@@ -194,4 +187,4 @@ async function run() {
     generateProject(answers);
 };
 
-run();
+createSite();
