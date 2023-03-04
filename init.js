@@ -18,7 +18,7 @@ export function addAllPlugins(plugins, markdownPlugins) {
 };
 
 export function setupAllPlugins(plugins, markdownPlugins) {
-    const pluginOptions = JSON.parse(fs.readFileSync("./lib/src/plugins/eleventy.json", "utf8"));
+    const pluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/eleventy.json", "utf8"));
     let pluginsString = "";
     for (let plugin of plugins) {
         if (pluginOptions[plugin].options !== "") {
@@ -27,7 +27,7 @@ export function setupAllPlugins(plugins, markdownPlugins) {
             pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))});\n`;
         }
     }
-    const markdownPluginOptions = JSON.parse(fs.readFileSync("./lib/src/plugins/markdown.json", "utf8"));
+    const markdownPluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/markdown.json", "utf8"));
     let markdownPluginsString = `
     const mdLib = markdownIt({
         html: true,
@@ -68,17 +68,17 @@ export function generateProject(answers) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
     const projectDirectory = slugify(name);
     const inputDirectory = path.join(projectDirectory, properties.input);
-    console.log(`Generating Eleventy project in \x1b[31m${path.join(__dirname, projectDirectory)}\x1b[0m.`);
+    console.log(`\nGenerating project in \x1b[32m${path.resolve(projectDirectory)}\x1b[0m.`);
     fs.mkdirSync(projectDirectory);
     fs.mkdirSync(inputDirectory);
-    console.log("Eleventy directories generated:");
+    console.log("\nEleventy directories generated:");
     const dirs = [properties.data, properties.includes];
     dirs.forEach((dir) => {
         fs.mkdirSync(path.join(inputDirectory, dir));
-        console.log(`- \n\x1b[31m${path.join(__dirname, projectDirectory, properties.input, dir)}\x1b[0m`);
+        console.log(`- \x1b[32m${path.join(projectDirectory, properties.input, dir)}\x1b[0m`);
     });
-    fs.writeFile(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
+    fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
-    console.log(`Eleventy configuration file generated in \x1b[31m${path.join(__dirname, projectDirectory, properties.configFile)}\x1b[0m.`);
+    console.log(`\nConfig file generated in \x1b[32m${path.resolve(projectDirectory, properties.configFile)}\x1b[0m.`);
 };
