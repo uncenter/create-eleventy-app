@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import fs from "fs";
 import chalk from "chalk";
 import { generateProject } from "./init.js";
-import { slugify, generateOptions } from "./utils.js";
+import { slugify, generateOptions, dirExists } from "./utils.js";
 
 async function createSite() {
     console.log(chalk.blue("\nWelcome to", chalk.underline.bold("create-eleventy-site") + "!"));
@@ -15,7 +15,7 @@ async function createSite() {
         message: "What is your project named?",
         default: "my-project",
         validate: (input) => {
-            if (fs.existsSync(slugify(input))) {
+            if (dirExists(input)) {
                 return "A directory with that name already exists.";
             }
             if (input.trim() === "") {

@@ -14,6 +14,20 @@ export function splitPath(pathString) {
     return path.parse(pathString).name;
 }
 
+export function dirExists(pathString) {
+    if (!fs.existsSync(pathString)) {
+        return false;
+    } else if (fs.lstatSync(pathString).isDirectory()) {
+        if (fs.readdirSync(pathString).length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        throw new Error("Path is not a directory.");
+    }
+}
+
 export function generateOptions(pathString) {
     if (!fs.existsSync(pathString)) {
         throw new Error("Path does not exist.");
