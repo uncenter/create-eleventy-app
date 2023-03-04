@@ -84,5 +84,5 @@ export function generateProject(answers) {
     });
     console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
     console.log(`\n${chalk.green("Success!")} Project generated successfully!`);
-    console.log(`\n${chalk.blue("Next steps:")} \n- cd ${projectDirectory} \n- npm install \n- npm start \n- Read the docs at https://www.11ty.dev/docs/!`);
+    console.log(`\n${chalk.blue("Next steps:")} \n- ${chalk.inverse("cd", projectDirectory)} \n- ${chalk.inverse("npm install")} \n- ${chalk.inverse("npm start")} \n- Learn more in the documentation at ${chalk.underline("https://www.11ty.dev/docs/")}!\n`);
 };
