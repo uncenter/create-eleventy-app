@@ -4,14 +4,14 @@ import { generateProject } from "./init.js";
 import { slugify, generateOptions } from "./utils.js";
 
 async function createSite() {
-    const projectNameAnswer = await inquirer.prompt({
+    const project = await inquirer.prompt({
         type: "input",
-        name: "projectName",
+        name: "name",
         message: "What is your project named?",
-        default: "Eleventy Starter",
+        default: "my-project",
         validate: (input) => {
             if (fs.existsSync(slugify(input))) {
-                return "A project with that name already exists.";
+                return "A directory with that name already exists.";
             }
             if (input.trim() === "") {
                 return "Please enter a project name.";
@@ -20,31 +20,31 @@ async function createSite() {
         },
     });
 
-    const configurationAnswer = await inquirer.prompt({
+    const frameworkConfiguration = await inquirer.prompt({
         type: "list",
-        name: "configuration",
-        message: "What configuration would you like to use?",
+        name: "answer",
+        message: "What framework configuration would you like to use?",
         choices: [
-            "Base",
-            "Base + Sass",
-            "Base + Tailwind",
-            "Base + Tailwind + Sass",
+            "None",
+            "Sass",
+            "Tailwind",
+            "Tailwind + Sass",
         ],
-        default: "Base",
+        default: "None",
     });
 
-    const customOrPacksAnswer = await inquirer.prompt({
-        type: "list",
-        name: "customOrPacks",
-        message: "What configuration would you like to use?",
-        choices: ["Packs", "Custom"],
+    const customOrStarter = await inquirer.prompt({
+        type: "confirm",
+        name: "answer",
+        message: "Would you like to use a starter bundle?",
+        default: false,
     });
 
-    let packsAnswer;
-    if (customOrPacksAnswer.customOrPacks === "Packs") {
-        packsAnswer = await inquirer.prompt({
+    let bundles;
+    if (customOrStarter.answer) {
+        bundles = await inquirer.prompt({
             type: "checkbox",
-            name: "addons",
+            name: "bundles",
             message: "What packs would you like to use?",
             choices: [
                 { name: "Blog Tools" },
@@ -53,7 +53,7 @@ async function createSite() {
             ],
         });
     } else {
-        packsAnswer = await inquirer.prompt([
+        bundles = await inquirer.prompt([
             {
                 type: "checkbox",
                 name: "filters",
@@ -92,39 +92,39 @@ async function createSite() {
         ]);
     }
 
-    const pluginsAnswer = await inquirer.prompt({
+    const eleventyPlugins = await inquirer.prompt({
         type: "checkbox",
-        name: "plugins",
+        name: "selected",
         message: "What plugins would you like to use?",
         choices: generateOptions("./lib/src/plugins/eleventy.json"),
     });
 
-    const markdownPluginsAnswer = await inquirer.prompt({
+    const markdownPlugins = await inquirer.prompt({
         type: "checkbox",
-        name: "markdownPlugins",
+        name: "selected",
         message: "What Markdown plugins would you like to use?",
         choices: generateOptions("./lib/src/plugins/markdown.json"),
     });
 
-    const pagesAnswer = await inquirer.prompt({
+    const pages = await inquirer.prompt({
         type: "checkbox",
-        name: "pages",
-        message: "What pages would you like to use?",
+        name: "selected",
+        message: "What pages would you like to add?",
         choices: [
             { name: "Blog", checked: true },
             { name: "Tags" },
         ],
     });
 
-    const advancedAnswer = await inquirer.prompt({
+    const advancedOrDefaults = await inquirer.prompt({
         type: "confirm",
-        name: "advanced",
+        name: "answer",
         message: "Advanced configuration?",
     });
 
-    let advancedConfiguration = {};
-    if (advancedAnswer.advanced) {  
-        advancedConfiguration = await inquirer.prompt([
+    let properties = {};
+    if (advancedOrDefaults.answer) {  
+        properties = await inquirer.prompt([
             {
                 type: "list",
                 name: "configFile",
@@ -158,7 +158,7 @@ async function createSite() {
             },
         ]);
     } else {
-        advancedConfiguration = {
+        properties = {
             configFile: "eleventy.config.js",
             output: "dist",
             input: "src",
@@ -167,22 +167,17 @@ async function createSite() {
         };
     }
 
-
-    const installAnswer = await inquirer.prompt({
-        type: "confirm",
-        name: "install",
-        message: "Install dependencies?",
-    });
-
     const answers = {
-        name: projectNameAnswer.projectName,
-        configuration: configurationAnswer.configuration,
-        packs: packsAnswer.packs,
-        plugins: pluginsAnswer.plugins,
-        markdownPlugins: markdownPluginsAnswer.markdownPlugins,
-        pages: pagesAnswer.pages,
-        properties: advancedConfiguration,
-        install: installAnswer.install,
+        name: project.name,
+        framework: frameworkConfiguration.answer,
+        bundles: bundles.bundles,
+        filters: bundles.filters,
+        shortcodes: bundles.shortcodes,
+        collections: bundles.collections,
+        eleventyPlugins: eleventyPlugins.selected,
+        markdownPlugins: markdownPlugins.selected,
+        pages: pages.selected,
+        properties: properties
     };
     generateProject(answers);
 };
