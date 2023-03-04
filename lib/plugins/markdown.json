@@ -12,7 +12,7 @@
         "options": ""
     },
     "markdown-it-link-attributes": {
-        "options": "attrs: { target: '_blank', rel: 'noopener noreferrer' }"
+        "options": "matcher(href, config) { return href.startsWith('https:'); }, attrs: { target: '_blank', rel: 'noopener noreferrer' }"
     },
     "markdown-it-sub": {
         "options": ""
