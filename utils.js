@@ -22,7 +22,7 @@ export function generateOptions(pathString) {
         const files = fs.readdirSync(pathString);
         let fileNames = [];
         for (let file of files) {
-            if (path.parse(file).ext === ".md" || path.parse(file).ext === ".json") {
+            if (path.parse(file).ext === ".md" || path.parse(file).ext === ".json" || path.parse(file).ext === ".njk") {
                 file = lodash.startCase(path.parse(file).name);
             } else {
                 file = path.parse(file).name;

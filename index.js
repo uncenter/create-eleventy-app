@@ -74,7 +74,7 @@ async function createSite() {
     const eleventyPlugins = await inquirer.prompt({
         type: "checkbox",
         name: "selected",
-        message: "What plugins would you like to use?",
+        message: "What Eleventy plugins would you like to use?",
         choices: generateOptions("./lib/plugins/eleventy.json"),
     });
 
