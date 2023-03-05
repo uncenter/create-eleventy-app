@@ -1,0 +1,11 @@
+{
+    "plugins": [],
+    "filters": [
+        "htmlDateString",
+        "readableDate"
+    ],
+    "shortcodes": [
+        "insertYear"
+    ],
+    "collections": []
+}

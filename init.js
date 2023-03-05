@@ -1,30 +1,35 @@
 import { slugify, deslugify, splitPath } from "./utils.js";
 import { copyFilePrint } from "./utils.js";
+import { debundle, addAddon } from "./utils.js";
 import fs from "fs";
 import path from "path";
 import beautify from "js-beautify";
 import chalk from "chalk";
 import child_process from "child_process";
 
-export function addAllPlugins(plugins, markdownPlugins) {
+export function addAllPlugins(plugins, markdownPlugins, extraImports) {
     function addPlugin(plugin) {
         return `const ${deslugify(splitPath(plugin))} = require("${plugin}");\n`;
     }
-    let pluginsString = "const markdownIt = require('markdown-it');\n"; // Markdown plugins require markdown-it
+    let pluginsString = "const markdownIt = require('markdown-it');\n";
     for (let plugin of plugins) {
-        pluginsString += addPlugin(plugin); // Add Eleventy plugins
+        pluginsString += addPlugin(plugin);
     }
     for (let markdownPlugin of markdownPlugins) {
-        pluginsString += addPlugin(markdownPlugin); // Add Markdown plugins
+        pluginsString += addPlugin(markdownPlugin);
+    }
+    if (extraImports.length > 0) {
+        for (let extraImport of extraImports) {
+            pluginsString += extraImport;
+        }
     }
     return pluginsString;
 };
 
 export function setupAllPlugins(plugins, markdownPlugins) {
-    const pluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/eleventy.json", "utf8")); // Get plugin options from JSON file
+    const pluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/eleventy.json", "utf8"));
     let pluginsString = "";
     for (let plugin of plugins) {
-        // Add plugin options if they exist
         if (pluginOptions[plugin].options !== "") {
             pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, { ${pluginOptions[plugin].options} });\n`;
         } else {
@@ -36,9 +41,8 @@ export function setupAllPlugins(plugins, markdownPlugins) {
         html: true,
         breaks: true,
         linkify: true,
-    })\n`; // Default options for markdown-it
+    })\n`;
     for (let markdownPlugin of markdownPlugins) {
-        // Add plugin options if they exist
         if (markdownPluginOptions[markdownPlugin].options !== "") {
             markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))}, { ${markdownPluginOptions[markdownPlugin].options} })`;
         } else {
@@ -53,10 +57,28 @@ export function setupAllPlugins(plugins, markdownPlugins) {
     return pluginsString + markdownPluginsString + `\televentyConfig.setLibrary("md", mdLib);\n`;
 };
 
-function createConfigFile(plugins, markdownPlugins, properties) {
-    return (`${addAllPlugins(plugins, markdownPlugins)}
+function createConfigFile(bundles, addonFilters, addonShortcodes, addonCollections, addonPlugins, addonMarkdownPlugins, properties) {
+    if (bundles.length > 0) {
+        for (let bundle of bundles) {
+            const { plugins, filters, shortcodes, collections } = debundle(bundle);
+            addonPlugins.push(...(plugins || []));
+            addonFilters.push(...(filters || []));
+            addonShortcodes.push(...(shortcodes || []));
+            addonCollections.push(...(collections || []));
+        }
+    }
+    const addons = [...addonFilters, ...addonShortcodes, ...addonCollections];
+    let extraImports = [];
+    let extraSetup = [];
+    for (let addon of addons) {
+        const { imports, func } = addAddon(addon);
+        extraImports.push(...(imports || []));
+        extraSetup.push(func);
+    }
+    return (`${addAllPlugins(addonPlugins, addonMarkdownPlugins, extraImports)}
 module.exports = function (eleventyConfig) {
-    ${setupAllPlugins(plugins, markdownPlugins)}
+    ${setupAllPlugins(addonPlugins, addonMarkdownPlugins)}
+    ${extraSetup.join("\n")}
     eleventyConfig.addPassthroughCopy("${properties.input}/css");
     eleventyConfig.addPassthroughCopy("${properties.input}/js");
     eleventyConfig.addPassthroughCopy("${properties.input}/img");
@@ -90,7 +112,7 @@ export function generateProject(answers) {
     });
 
     // Write config file
-    fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
+    fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
     console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
@@ -146,7 +168,12 @@ export function generateProject(answers) {
         child_process.execSync(`cd ${projectDirectory} && npm install ${markdownPlugin}`);
     }
 
+    if (framework !== undefined) {
+        console.log(`\n🎨 Installing ${chalk.blue(framework)}...`);
+    }
+    console.log(`\n🧹 Cleaning up...`);
+
     // Print success message
-    console.log(`\n${chalk.green.bold("✅ Finished!")} Project generated successfully!`);
-    console.log(`\n${chalk.cyan("🔥 Next steps:")} \n\n   - ${chalk.bold("cd", projectDirectory)} \n   - ${chalk.bold("npm install")} \n   - ${chalk.bold("npm start")} \n   - Learn more in the documentation at ${chalk.underline("https://www.11ty.dev/docs/")}\n`);
+    console.log(`\n${chalk.green.bold("⭐ Success!")} Project generation complete!`);
+    console.log(`\n${chalk.cyan("🔥 Next steps!")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}\n`);
 };

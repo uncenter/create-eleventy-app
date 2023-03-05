@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        "@11ty/eleventy-plugin-rss"
+    ],
+    "filters": [],
+    "shortcodes": [],
+    "collections": [
+        "posts"
+    ]
+}

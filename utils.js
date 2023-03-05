@@ -57,3 +57,50 @@ export function copyFilePrint(inputPathString, outputPathString) {
     fs.copyFileSync(inputPathString, outputPathString);
     console.log(`- ${chalk.dim(outputPathString)}`);
 }
+
+export function debundle(bundle) {
+    bundle = JSON.parse(fs.readFileSync(path.join("./lib/addons/bundles", slugify(bundle) + ".json"), "utf8"));
+    return { plugins: bundle.plugins, filters: bundle.filters, shortcodes: bundle.shortcodes, collections: bundle.collections };
+}
+
+function findFile(filename, parentDirectory) {
+    const files = fs.readdirSync(parentDirectory);
+    for (let file of files) {
+        if (fs.lstatSync(path.join(parentDirectory, file)).isDirectory()) {
+            const result = findFile(filename, path.join(parentDirectory, file));
+            if (result) {
+                return result;
+            }
+        } else if (file === filename) {
+            return path.join(parentDirectory, file);
+        }
+    }
+    return false;
+}
+
+export function addAddon(addonName) {
+    let addon = fs.readFileSync(findFile(addonName + ".js", "./lib/addons"), "utf8");
+    const imports = addon.match(/const .* = require\(".*"\);/g); 
+    if (imports) {
+        for (let imp of imports) {
+            addon = addon.replace(imp, "");
+        }
+    }
+    const func = addon;
+    return { imports,  func };
+}
+
+export function removeDuplicateImports(file) {
+    const uniqueImports = [];
+    const imports = file.match(/const .* = require\(".*"\);/g);
+    for (let imp of imports) {
+        if (!uniqueImports.includes(imp)) {
+            uniqueImports.push(imp);
+        } else {
+            file = file.replace(imp, "");
+        }
+    }
+    return file;
+}
+
+// console.log(removeDuplicateImports(fs.readFileSync("./my-project/eleventy.config.js", "utf8")));
