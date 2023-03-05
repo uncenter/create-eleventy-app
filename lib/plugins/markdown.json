@@ -20,7 +20,7 @@
     "markdown-it-sup": {
         "options": ""
     },
-    "markdown-it-checklist": {
+    "markdown-it-task-checkbox": {
         "options": "disabled: true, divWrap: false, idPrefix: '', ulClass: 'checklist', liClass: 'checklist-item'"
     },
     "markdown-it-abbr": {

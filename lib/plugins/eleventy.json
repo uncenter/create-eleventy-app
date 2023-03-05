@@ -1,5 +1,5 @@
 {
-    "eleventy-plugin-rss": {
+    "@11ty/eleventy-plugin-rss": {
         "options": ""
     }
 }
