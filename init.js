@@ -1,4 +1,5 @@
 import { slugify, deslugify, splitPath } from "./utils.js";
+import { copyFilePrint } from "./utils.js";
 import fs from "fs";
 import path from "path";
 import beautify from "js-beautify";
@@ -88,20 +89,19 @@ export function generateProject(answers) {
     });
     console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
     console.log(`\n📥 Copying files...`);
-    fs.copyFileSync("./lib/files/.gitignore", path.join(projectDirectory, ".gitignore"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, ".gitignore"))}`);
-    fs.copyFileSync("./lib/files/README.md", path.join(projectDirectory, "README.md"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, "README.md"))}`);
-    fs.copyFileSync("./lib/files/pages/index.md", path.join(inputDirectory, "index.md"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "index.md"))}`);
-    fs.copyFileSync("./lib/files/site.json", path.join(inputDirectory, properties.data, "site.json"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, properties.data, "site.json"))}`);
-    fs.copyFileSync("./lib/files/style.css", path.join(inputDirectory, "css", "style.css"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "css", "style.css"))}`);
-    fs.copyFileSync("./lib/files/base.njk", path.join(inputDirectory, properties.includes, "base.njk"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, properties.includes, "base.njk"))}`);
-    fs.copyFileSync("./lib/files/logo.png", path.join(inputDirectory, "img", "logo.png"));
-    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "img", "logo.png"))}`);
+    const filesToCopy = {
+        ".gitignore": ".gitignore",
+        "README.md": "README.md",
+        "index.md": path.join(properties.input, "index.md"),
+        "site.json": path.join(properties.input, properties.data, "site.json"),
+        "style.css": path.join(properties.input, "css/style.css"),
+        "base.njk": path.join(properties.input, properties.includes, "base.njk"),
+        "logo.png": path.join(properties.input, "img/logo.png")
+    }
+    for (let source in filesToCopy) {
+        copyFilePrint(path.join("./lib/files", source), path.join(projectDirectory, filesToCopy[source]));
+    }
+    console.log(`\n📝 Creating package.json...`);
     fs.writeFileSync(path.join(projectDirectory, "package.json"), beautify(`{
         "name": "${name}",
         "private": true,

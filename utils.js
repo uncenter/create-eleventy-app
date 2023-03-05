@@ -1,6 +1,7 @@
 import lodash from "lodash";
 import fs from "fs";
 import path from "path";
+import chalk from "chalk";
 
 export function deslugify(string) {
     return lodash.camelCase(string);
@@ -50,4 +51,9 @@ export function generateOptions(pathString) {
             return { name: item };
         });
     }
+}
+
+export function copyFilePrint(inputPathString, outputPathString) {
+    fs.copyFileSync(inputPathString, outputPathString);
+    console.log(`- ${chalk.dim(outputPathString)}`);
 }
