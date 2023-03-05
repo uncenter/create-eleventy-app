@@ -5,8 +5,8 @@ import { generateProject } from "./init.js";
 import { slugify, generateOptions, dirExists } from "./utils.js";
 
 async function createSite() {
-    console.log(chalk.blue("\nWelcome to", chalk.underline.bold("create-eleventy-site") + "!"));
-    console.log(`\nTo get started, please answer the following questions (you can always change these settings later).\nIf you are unsure about any of the questions, you can press ${chalk.inverse("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
+    console.log(chalk.green("\n👋  Welcome to", chalk.underline.bold("Create Eleventy Site") + "!"));
+    console.log(`\n✨ To get started, please answer the following questions (you can always change these settings later).\n🙋 If you are unsure about any of the questions, you can press ${chalk.bold("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
 
 
     const project = await inquirer.prompt({
