@@ -8,14 +8,13 @@ async function createSite() {
     console.log(chalk.green("\n👋  Welcome to", chalk.underline.bold("Create Eleventy Site") + "!"));
     console.log(`\n✨ To get started, please answer the following questions (you can always change these settings later).\n🙋 If you are unsure about any of the questions, you can press ${chalk.bold("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
 
-
     const project = await inquirer.prompt({
         type: "input",
         name: "name",
         message: "What is your project named?",
         default: "my-project",
         validate: (input) => {
-            if (dirExists(input)) {
+            if (dirExists(input)) { // Check if the directory already exists or if it is empty
                 return "A directory with that name already exists.";
             }
             if (input.trim() === "") {
@@ -52,7 +51,7 @@ async function createSite() {
             type: "checkbox",
             name: "selected",
             message: "What bundles would you like to use?",
-            choices: generateOptions("./lib/addons/bundles/")
+            choices: generateOptions("./lib/addons/bundles/") // Generate a list of bundles based on the files in the bundles directory
         });
         customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
     } else {
