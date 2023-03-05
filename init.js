@@ -92,8 +92,6 @@ export function generateProject(answers) {
     console.log(`- ${chalk.dim(path.join(projectDirectory, ".gitignore"))}`);
     fs.copyFileSync("./lib/files/README.md", path.join(projectDirectory, "README.md"));
     console.log(`- ${chalk.dim(path.join(projectDirectory, "README.md"))}`);
-    // fs.copyFileSync("./lib/files/package.json", path.join(projectDirectory, "package.json"));
-    // console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
     fs.copyFileSync("./lib/files/pages/index.md", path.join(inputDirectory, "index.md"));
     console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "index.md"))}`);
     fs.copyFileSync("./lib/files/site.json", path.join(inputDirectory, properties.data, "site.json"));
@@ -104,8 +102,25 @@ export function generateProject(answers) {
     console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, properties.includes, "base.njk"))}`);
     fs.copyFileSync("./lib/files/logo.png", path.join(inputDirectory, "img", "logo.png"));
     console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "img", "logo.png"))}`);
+    fs.writeFileSync(path.join(projectDirectory, "package.json"), beautify(`{
+        "name": "${name}",
+        "private": true,
+        "version": "1.0.0",
+        "description": "A new Eleventy project",
+        "main": "${properties.configFile}",
+        "scripts": {
+            "clean": "rm -rf ${properties.output}",
+            "start": "eleventy --serve",
+            "build": "eleventy"
+        },
+        "author": "",
+        "license": "MIT",
+        "dependencies": {}
+    }`, { indent_size: 4 }), function (err) {
+        if (err) throw err;
+    });
+    console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
     console.log(`\n📦 Installing dependencies...`);
-    child_process.execSync(`cd ${projectDirectory} && npm init -y`);
     child_process.execSync(`cd ${projectDirectory} && npm install @11ty/eleventy`);
     for (let plugin of eleventyPlugins) {
         child_process.execSync(`cd ${projectDirectory} && npm install ${plugin}`);
