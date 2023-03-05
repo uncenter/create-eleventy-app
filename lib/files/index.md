@@ -1,6 +1,6 @@
 ---
 layout: base.njk
-title: Learn Eleventy
+title: Create Eleventy App
 ---
 <div id="site">
   <img src="img/logo.png" class="logo" alt="Eleventy logo" />
