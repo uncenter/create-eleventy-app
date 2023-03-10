@@ -47,6 +47,6 @@ To modify the site metadata, edit the `src/_data/site.json` file. For example, t
 - [111ty](https://github.com/danfascia/111ty)
     - Nice baseline starter with TailwindCSS, SEO and Inline JS from Unpkg 
 - [eleventy-excellent](https://github.com/madrilene/eleventy-excellent)
-    - Opiniated Eleventy starter based on the workflow suggested by Andy Bell's buildexcellentwebsit.es. 
+    - Opinionated Eleventy starter based on the workflow suggested by Andy Bell's buildexcellentwebsit.es. 
 - [eleventy-notes](https://github.com/rothsandro/eleventy-notes)
     - A template for Eleventy to publish your personal notes or docs.
