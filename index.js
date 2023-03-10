@@ -48,7 +48,7 @@ async function run() {
             type: "confirm",
             name: "answer",
             message: "Use starter bundles?",
-            default: true,
+            default: false,
         });
         if (useBundles.answer) {
             bundles = await inquirer.prompt({
