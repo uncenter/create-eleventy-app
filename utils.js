@@ -57,11 +57,6 @@ export function generateOptions(pathString) {
     }
 }
 
-export function copyFilePrint(inputPathString, outputPathString) {
-    fs.copyFileSync(inputPathString, outputPathString);
-    console.log(`- ${chalk.dim(outputPathString)}`);
-}
-
 export function debundle(bundle) {
     bundle = JSON.parse(fs.readFileSync(path.join("./lib/addons/bundles", slugify(bundle) + ".json"), "utf8"));
     return { plugins: bundle.plugins, filters: bundle.filters, shortcodes: bundle.shortcodes, collections: bundle.collections };

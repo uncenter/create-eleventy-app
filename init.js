@@ -1,5 +1,4 @@
 import { slugify, deslugify, splitPath } from "./utils.js";
-import { copyFilePrint } from "./utils.js";
 import { debundle, addAddon } from "./utils.js";
 import fs from "fs";
 import path from "path";
@@ -97,32 +96,35 @@ module.exports = function (eleventyConfig) {
 };` );
 };
 
-export function generateProject(answers) {
+export function generateProject(answers, options) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
-
     // Generate project directory and subdirectories
     const projectDirectory = slugify(name);
     const inputDirectory = path.join(projectDirectory, properties.input);
     console.log(`\n🚀 Generating project in ${chalk.blue(path.resolve(projectDirectory))}.`);
     console.log(`\n🔨 Creating some directories...`);
     fs.mkdirSync(projectDirectory);
-    console.log(`- ${chalk.dim(projectDirectory)}`);
     fs.mkdirSync(inputDirectory);
-    console.log(`- ${chalk.dim(inputDirectory)}`);
+    if (options.verbose) {
+        console.log(`- ${chalk.dim(projectDirectory)}`);
+        console.log(`- ${chalk.dim(inputDirectory)}`);
+    }
     const dirs = [properties.data, properties.includes, 'css', 'js', 'img'];
     dirs.forEach((dir) => {
         fs.mkdirSync(path.join(inputDirectory, dir));
-        console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
+        if (options.silent) {
+            console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
+        }
     });
 
     // Write config file
     fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
-    console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
+    if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
 
     // Copy template files
-    console.log(`\n📥 Copying files...`);
+    console.log(`📥 Copying files...`);
     const filesToCopy = {
         ".gitignore": ".gitignore",
         "README.md": "README.md",
@@ -139,11 +141,12 @@ export function generateProject(answers) {
         });
     }
     for (let source in filesToCopy) {
-        copyFilePrint(path.join("./lib/files", source), path.join(projectDirectory, filesToCopy[source]));
+        fs.copyFileSync(path.join("./lib/files", source), path.join(projectDirectory, filesToCopy[source]));
+        if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, filesToCopy[source]))}`);
     }
 
     // Create package.json and install dependencies
-    console.log(`\n📝 Creating package.json...`);
+    console.log(`📝 Writing package.json...`);
     fs.writeFileSync(path.join(projectDirectory, "package.json"), beautify(`{
         "name": "${name}",
         "private": true,
@@ -161,7 +164,7 @@ export function generateProject(answers) {
     }`, { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
-    console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
+    if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
     const allDependencies = [...eleventyPlugins, ...markdownPlugins];
     var bar = new ProgressBar('[:bar] :percent', {
         complete: '=',
@@ -171,10 +174,10 @@ export function generateProject(answers) {
     });
     if (allDependencies.length > 0) {
         console.log(`\n📦 Installing dependencies...\n`);
+        bar.tick();
         child_process.execSync(`cd ${projectDirectory} && npm install @11ty/eleventy`);
         bar.tick();
         child_process.execSync(`cd ${projectDirectory} && npm install markdown-it`);
-        bar.tick();
         for (let dependency of allDependencies) {
             child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
             bar.tick();
@@ -185,7 +188,7 @@ export function generateProject(answers) {
     if (framework !== null && framework !== undefined) {
         console.log(`\n🎨 Installing ${chalk.blue(framework)}...`);
     }
-    
+
     // Print success message
     console.log(`\n${chalk.green.bold("⭐ Success!")} Project generation complete!`);
     console.log(`\n${chalk.cyan("🔥 Next steps!")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}\n`);

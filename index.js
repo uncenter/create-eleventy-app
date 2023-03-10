@@ -1,10 +1,21 @@
 import inquirer from "inquirer";
 import fs from "fs";
+import yargs from "yargs";
 import chalk from "chalk";
+
 import { generateProject } from "./init.js";
-import { slugify, deslugify, toTitleCase, generateOptions, dirExists } from "./utils.js";
+import { toTitleCase, generateOptions, dirExists } from "./utils.js";
 
 const __name__ = "create-eleventy-app";
+
+const argv = yargs(process.argv.slice(2))
+    .option("verbose", {
+        alias: "v",
+        describe: "Print verbose output",
+        type: "boolean",
+        default: false,
+    })
+    .argv;
 
 async function run() {
     console.log(chalk.green("\n👋  Welcome to", chalk.underline.bold(toTitleCase(__name__)), "v0.1.0!"));
@@ -28,7 +39,7 @@ async function run() {
     const quickstart = await inquirer.prompt({
         type: "confirm",
         name: "answer",
-        message: "Quickstart? (recommended for first-time users - accept default values and use starter bundles)",
+        message: "Quickstart? (recommended for first-time users)",
         default: true,
     });
 
@@ -190,7 +201,7 @@ async function run() {
         pages: customizations.pages,
         properties: properties
     };
-    generateProject(answers);
+    generateProject(answers, argv);
 };
 
 run();
