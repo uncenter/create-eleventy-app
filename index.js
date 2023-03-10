@@ -6,19 +6,32 @@ import chalk from "chalk";
 import { generateProject } from "./init.js";
 import { toTitleCase, generateOptions, dirExists } from "./utils.js";
 
-const __name__ = "create-eleventy-app";
+const __name = "create-eleventy-app";
+const __version = "0.1.0";
 
 const argv = yargs(process.argv.slice(2))
+    .version(__version)
     .option("verbose", {
         alias: "v",
         describe: "Print verbose output",
         type: "boolean",
         default: false,
     })
+    .option("silent", {
+        alias: "s",
+        describe: "Silence all output",
+        type: "boolean",
+        default: false,
+    })
     .argv;
 
+if (argv.verbose && argv.silent) {
+    console.error("You cannot use both --verbose and --silent.");
+    process.exit(1);
+}
+
 async function run() {
-    console.log(chalk.green("\n👋  Welcome to", chalk.underline.bold(toTitleCase(__name__)), "v0.1.0!"));
+    console.log(chalk.green("\n👋  Welcome to", chalk.underline.bold(toTitleCase(__name)), "v0.1.0!"));
     console.log(`\n✨ To get started, please answer the following questions (you can always change these settings later).\n🙋 If you are unsure about any of the questions, you can press ${chalk.bold("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
 
     const project = await inquirer.prompt({

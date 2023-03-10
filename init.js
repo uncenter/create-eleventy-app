@@ -98,6 +98,11 @@ module.exports = function (eleventyConfig) {
 
 export function generateProject(answers, options) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
+    console.log("🤫 Generating project silently...");
+    if (options.silent) {
+        const restoreLog = console.log;
+        console.log = () => {};
+    }
     // Generate project directory and subdirectories
     const projectDirectory = slugify(name);
     const inputDirectory = path.join(projectDirectory, properties.input);
@@ -175,6 +180,7 @@ export function generateProject(answers, options) {
     if (allDependencies.length > 0) {
         console.log(`\n📦 Installing dependencies...\n`);
         bar.tick();
+        console.log = restoreLog;
         child_process.execSync(`cd ${projectDirectory} && npm install @11ty/eleventy`);
         bar.tick();
         child_process.execSync(`cd ${projectDirectory} && npm install markdown-it`);
