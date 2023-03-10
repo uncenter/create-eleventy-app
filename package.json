@@ -1,4 +1,12 @@
 {
+    "name": "create-eleventy-app",
+    "author": "uncenter",
+    "version": "0.1.0",
+    "description": "Create an Eleventy app with a single command",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/uncenter/create-eleventy-app"
+    },
     "type": "module",
     "exports": "./index.js",
     "dependencies": {
