@@ -168,7 +168,7 @@ export function generateProject(answers) {
         child_process.execSync(`cd ${projectDirectory} && npm install ${markdownPlugin}`);
     }
 
-    if (framework !== undefined) {
+    if (framework !== null && framework !== undefined) {
         console.log(`\n🎨 Installing ${chalk.blue(framework)}...`);
     }
     console.log(`\n🧹 Cleaning up...`);

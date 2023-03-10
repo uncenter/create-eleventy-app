@@ -24,19 +24,6 @@ async function run() {
         },
     });
 
-    const frameworkConfiguration = await inquirer.prompt({
-        type: "list",
-        name: "answer",
-        message: "Would you like to add a framework?",
-        choices: [
-            "None",
-            "Sass",
-            "Tailwind",
-            "Tailwind + Sass",
-        ],
-        default: "None",
-    });
-
     const customOrStarter = await inquirer.prompt({
         type: "confirm",
         name: "answer",
@@ -107,7 +94,21 @@ async function run() {
     });
 
     let properties = {};
+    // let frameworkConfiguration = {};
+    let frameworkConfiguration = { answer: null };
     if (advancedOrDefaults.answer) {  
+        // frameworkConfiguration = await inquirer.prompt({
+        //     type: "list",
+        //     name: "answer",
+        //     message: "Would you like to add a framework?",
+        //     choices: [
+        //         "None",
+        //         "Sass",
+        //         "Tailwind",
+        //         "Tailwind + Sass",
+        //     ],
+        //     default: "None",
+        // });
         properties = await inquirer.prompt([
             {
                 type: "list",
