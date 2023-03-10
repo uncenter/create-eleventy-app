@@ -23,6 +23,18 @@ const argv = yargs(process.argv.slice(2))
         type: "boolean",
         default: false,
     })
+    .option("set", {
+        alias: "e",
+        describe: "Use a specific version of Eleventy",
+        type: "string",
+        default: "latest",
+    })
+    .option("noinstall", {
+        alias: "n",
+        describe: "Do not install dependencies",
+        type: "boolean",
+        default: false,
+    })
     .argv;
 
 if (argv.verbose && argv.silent) {

@@ -98,9 +98,10 @@ module.exports = function (eleventyConfig) {
 
 export function generateProject(answers, options) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
-    console.log("🤫 Generating project silently...");
+    
+    const restoreLog = console.log;
     if (options.silent) {
-        const restoreLog = console.log;
+        console.log("🤫 Generating project silently...");
         console.log = () => {};
     }
     // Generate project directory and subdirectories
@@ -170,31 +171,28 @@ export function generateProject(answers, options) {
         if (err) throw err;
     });
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
-    const allDependencies = [...eleventyPlugins, ...markdownPlugins];
-    var bar = new ProgressBar('[:bar] :percent', {
-        complete: '=',
-        incomplete: ' ',
-        width: 20,
-        total: allDependencies.length + 2
-    });
-    if (allDependencies.length > 0) {
+    if (!options.noinstall) {
+        const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@'+options.set];
+        var bar = new ProgressBar('[:bar] :percent', {
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: allDependencies.length
+        });
         console.log(`\n📦 Installing dependencies...\n`);
-        bar.tick();
         console.log = restoreLog;
-        child_process.execSync(`cd ${projectDirectory} && npm install @11ty/eleventy`);
-        bar.tick();
-        child_process.execSync(`cd ${projectDirectory} && npm install markdown-it`);
         for (let dependency of allDependencies) {
             child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
             bar.tick();
         }
         console.log('\n✅ Dependencies installed.');
-    }
 
-    if (framework !== null && framework !== undefined) {
-        console.log(`\n🎨 Installing ${chalk.blue(framework)}...`);
+        if (framework !== null && framework !== undefined) {
+            console.log(`\n🎨 Adding ${chalk.blue(framework)}...`);
+        }
+    } else {
+        console.log(`\n❌ Dependencies not installed (expected, since --noinstall was passed).`);
     }
-
     // Print success message
     console.log(`\n${chalk.green.bold("⭐ Success!")} Project generation complete!`);
     console.log(`\n${chalk.cyan("🔥 Next steps!")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}\n`);
