@@ -7,6 +7,10 @@ export function deslugify(string) {
     return lodash.camelCase(string);
 }
 
+export function toTitleCase(string) {
+    return lodash.startCase(string);
+}
+
 export function slugify(string) {
     return lodash.kebabCase(string);
 }
