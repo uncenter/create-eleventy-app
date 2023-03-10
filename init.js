@@ -6,6 +6,8 @@ import path from "path";
 import beautify from "js-beautify";
 import chalk from "chalk";
 import child_process from "child_process";
+import ProgressBar from "progress";
+
 
 export function addAllPlugins(plugins, markdownPlugins, extraImports) {
     function addPlugin(plugin) {
@@ -160,21 +162,30 @@ export function generateProject(answers) {
         if (err) throw err;
     });
     console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
-    console.log(`\n📦 Installing dependencies...`);
-    child_process.execSync(`cd ${projectDirectory} && npm install @11ty/eleventy`);
-    for (let plugin of eleventyPlugins) {
-        child_process.execSync(`cd ${projectDirectory} && npm install ${plugin}`);
-    }
-    child_process.execSync(`cd ${projectDirectory} && npm install markdown-it`);
-    for (let markdownPlugin of markdownPlugins) {
-        child_process.execSync(`cd ${projectDirectory} && npm install ${markdownPlugin}`);
+    const allDependencies = [...eleventyPlugins, ...markdownPlugins];
+    var bar = new ProgressBar('[:bar] :percent', {
+        complete: '=',
+        incomplete: ' ',
+        width: 20,
+        total: allDependencies.length + 2
+    });
+    if (allDependencies.length > 0) {
+        console.log(`\n📦 Installing dependencies...\n`);
+        child_process.execSync(`cd ${projectDirectory} && npm install @11ty/eleventy`);
+        bar.tick();
+        child_process.execSync(`cd ${projectDirectory} && npm install markdown-it`);
+        bar.tick();
+        for (let dependency of allDependencies) {
+            child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
+            bar.tick();
+        }
+        console.log('\n✅ Dependencies installed.');
     }
 
     if (framework !== null && framework !== undefined) {
         console.log(`\n🎨 Installing ${chalk.blue(framework)}...`);
     }
-    console.log(`\n🧹 Cleaning up...`);
-
+    
     // Print success message
     console.log(`\n${chalk.green.bold("⭐ Success!")} Project generation complete!`);
     console.log(`\n${chalk.cyan("🔥 Next steps!")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}\n`);
