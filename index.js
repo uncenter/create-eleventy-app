@@ -158,15 +158,14 @@ async function run() {
     }
     if (customizations === undefined) {
         customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
+    } else {
+        customizations.pages = [];
     }
     if (bundles === undefined) {
         bundles = { selected: [] };
     }
     if (framework === undefined) {
         framework = { answer: null };
-    }
-    if (pages === undefined) {
-        pages = { selected: [] };
     }
     if (properties === undefined) {
         properties = {
