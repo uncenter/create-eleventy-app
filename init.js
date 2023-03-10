@@ -11,7 +11,7 @@ export function addAllPlugins(plugins, markdownPlugins, extraImports) {
     function addPlugin(plugin) {
         return `const ${deslugify(splitPath(plugin))} = require("${plugin}");\n`;
     }
-    let pluginsString = "const markdownIt = require('markdown-it');\n";
+    let pluginsString = "// Imports\nconst markdownIt = require('markdown-it');\n";
     for (let plugin of plugins) {
         pluginsString += addPlugin(plugin);
     }
@@ -28,7 +28,7 @@ export function addAllPlugins(plugins, markdownPlugins, extraImports) {
 
 export function setupAllPlugins(plugins, markdownPlugins) {
     const pluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/eleventy.json", "utf8"));
-    let pluginsString = "";
+    let pluginsString = "// Eleventy Plugins\n";
     for (let plugin of plugins) {
         if (pluginOptions[plugin].options !== "") {
             pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, { ${pluginOptions[plugin].options} });\n`;
@@ -37,7 +37,7 @@ export function setupAllPlugins(plugins, markdownPlugins) {
         }
     }
     const markdownPluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/markdown.json", "utf8"));
-    let markdownPluginsString = `const mdLib = markdownIt({
+    let markdownPluginsString = `// Markdown Configuration\nconst mdLib = markdownIt({
         html: true,
         breaks: true,
         linkify: true,
@@ -78,10 +78,12 @@ function createConfigFile(bundles, addonFilters, addonShortcodes, addonCollectio
     return (`${addAllPlugins(addonPlugins, addonMarkdownPlugins, extraImports)}
 module.exports = function (eleventyConfig) {
     ${setupAllPlugins(addonPlugins, addonMarkdownPlugins)}
-    ${extraSetup.join("\n")}
+    ${(extraSetup.length > 0) ? `// Filters, Shortcodes, and Collections\n${extraSetup.join('\n')}` : ""}
+    // Passthrough Copy
     eleventyConfig.addPassthroughCopy("${properties.input}/css");
     eleventyConfig.addPassthroughCopy("${properties.input}/js");
     eleventyConfig.addPassthroughCopy("${properties.input}/img");
+
     return {
         dir: {
             input: "${properties.input}",
