@@ -7,7 +7,6 @@ import chalk from "chalk";
 import child_process from "child_process";
 import ProgressBar from "progress";
 
-
 export function addAllPlugins(plugins, markdownPlugins, extraImports) {
     function addPlugin(plugin) {
         return `const ${deslugify(splitPath(plugin))} = require("${plugin}");\n`;
@@ -98,11 +97,11 @@ module.exports = function (eleventyConfig) {
 
 export function generateProject(answers, options) {
     const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
-    
+
     const restoreLog = console.log;
     if (options.silent) {
         console.log("🤫 Generating project silently...");
-        console.log = () => {};
+        console.log = () => { };
     }
     // Generate project directory and subdirectories
     const projectDirectory = slugify(name);
@@ -172,7 +171,7 @@ export function generateProject(answers, options) {
     });
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
     if (!options.noinstall) {
-        const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@'+options.set];
+        const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@' + options.set];
         var bar = new ProgressBar('[:bar] :percent', {
             complete: '=',
             incomplete: ' ',

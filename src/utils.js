@@ -1,14 +1,9 @@
 import lodash from "lodash";
 import fs from "fs";
 import path from "path";
-import chalk from "chalk";
 
 export function deslugify(string) {
     return lodash.camelCase(string);
-}
-
-export function toTitleCase(string) {
-    return lodash.startCase(string);
 }
 
 export function slugify(string) {
@@ -46,7 +41,7 @@ export function generateOptions(pathString) {
             } else {
                 file = path.parse(file).name;
             }
-            fileNames.push( { name: file });
+            fileNames.push({ name: file });
         }
         return fileNames;
     } else {
@@ -79,14 +74,14 @@ function findFile(filename, parentDirectory) {
 
 export function addAddon(addonName) {
     let addon = fs.readFileSync(findFile(addonName + ".js", "./lib/addons"), "utf8");
-    const imports = addon.match(/const .* = require\(".*"\);/g); 
+    const imports = addon.match(/const .* = require\(".*"\);/g);
     if (imports) {
         for (let imp of imports) {
             addon = addon.replace(imp, "");
         }
     }
     const func = addon;
-    return { imports,  func };
+    return { imports, func };
 }
 
 export function removeDuplicateImports(file) {
