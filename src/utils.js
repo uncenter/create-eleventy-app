@@ -84,6 +84,25 @@ export function addAddon(addonName) {
     return { imports, func };
 }
 
+export async function queryPackage(packageName, version = null) {
+    let endpoint;
+    if (version) {
+        endpoint = `https://registry.npmjs.org/${packageName}/${version}`;
+    } else {
+        endpoint = `https://registry.npmjs.org/${packageName}`;
+    }
+    const res = await fetch(endpoint);
+    const data = await res.json();
+    function getLatestVersion() {
+        const versions = Object.keys(data.versions);
+        return versions[versions.length - 1];
+    }
+    function getAllVersions() {
+        return Object.keys(data.versions);
+    }
+    return { name: data.name, description: data.description, version: getLatestVersion(), versions: getAllVersions() };
+}
+
 export function removeDuplicateImports(file) {
     const uniqueImports = [];
     const imports = file.match(/const .* = require\(".*"\);/g);

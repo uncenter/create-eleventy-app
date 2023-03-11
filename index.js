@@ -5,6 +5,7 @@ import lodash from "lodash";
 
 import { generateProject } from "./src/init.js";
 import { prompts } from "./src/prompts.js";
+import { queryPackage } from "./src/utils.js";
 
 const __name = "create-eleventy-app";
 const __version = "0.1.0";
@@ -42,8 +43,9 @@ if (argv.verbose && argv.silent) {
     process.exit(1);
 }
 if (argv.set !== "latest") {
-    if (!argv.set.match(/^[0-9]+\.[0-9]+\.[0-9]+$/)) {
-        console.error("You must specify a valid version of Eleventy (e.g. 2.0.0).");
+    const data = await queryPackage("@11ty/eleventy");
+    if (!data.versions.includes(argv.set)) {
+        console.error(`@11ty/eleventy@${argv.set} does not exist. Please use a valid version number (e.g. ${data.version}).`);
         process.exit(1);
     }
 }
