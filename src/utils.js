@@ -1,6 +1,9 @@
 import lodash from "lodash";
 import fs from "fs";
 import path from "path";
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export function deslugify(string) {
     return lodash.camelCase(string);
@@ -53,7 +56,7 @@ export function generateOptions(pathString) {
 }
 
 export function debundle(bundle) {
-    bundle = JSON.parse(fs.readFileSync(path.join("./lib/addons/bundles", slugify(bundle) + ".json"), "utf8"));
+    bundle = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "./lib/addons/bundles", slugify(bundle) + ".json"), "utf8"));
     return { plugins: bundle.plugins, filters: bundle.filters, shortcodes: bundle.shortcodes, collections: bundle.collections };
 }
 
@@ -73,7 +76,7 @@ function findFile(filename, parentDirectory) {
 }
 
 export function addAddon(addonName) {
-    let addon = fs.readFileSync(findFile(addonName + ".js", "./lib/addons"), "utf8");
+    let addon = fs.readFileSync(findFile(addonName + ".js", path.join(__dirname, "..", "./lib/addons"), "utf8")).toString();
     const imports = addon.match(/const .* = require\(".*"\);/g);
     if (imports) {
         for (let imp of imports) {
@@ -115,5 +118,3 @@ export function removeDuplicateImports(file) {
     }
     return file;
 }
-
-// console.log(removeDuplicateImports(fs.readFileSync("./my-project/eleventy.config.js", "utf8")));

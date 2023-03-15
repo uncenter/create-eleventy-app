@@ -6,6 +6,9 @@ import beautify from "js-beautify";
 import chalk from "chalk";
 import child_process from "child_process";
 import ProgressBar from "progress";
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export function addAllPlugins(plugins, markdownPlugins, extraImports) {
     function addPlugin(plugin) {
@@ -27,7 +30,7 @@ export function addAllPlugins(plugins, markdownPlugins, extraImports) {
 };
 
 export function setupAllPlugins(plugins, markdownPlugins) {
-    const pluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/eleventy.json", "utf8"));
+    const pluginOptions = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "/lib/plugins/eleventy.json"), "utf8"));
     let pluginsString = "// Eleventy Plugins\n";
     if (plugins.length === 0) {
         pluginsString = "";
@@ -39,7 +42,7 @@ export function setupAllPlugins(plugins, markdownPlugins) {
             pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))});\n`;
         }
     }
-    const markdownPluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/markdown.json", "utf8"));
+    const markdownPluginOptions = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "/lib/plugins/markdown.json"), "utf8"));
     let markdownPluginsString = `// Markdown Configuration\nconst mdLib = markdownIt({
         html: true,
         breaks: true,
@@ -173,7 +176,7 @@ export function generateProject(answers, options) {
         });
     }
     for (let source in filesToCopy) {
-        fs.copyFileSync(path.join("./lib/files", source), path.join(projectDirectory, filesToCopy[source]));
+        fs.copyFileSync(path.join(__dirname, "..", "/lib/files", source), path.join(projectDirectory, filesToCopy[source]));
         if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, filesToCopy[source]))}`);
     }
 

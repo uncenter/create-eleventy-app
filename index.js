@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import inquirer from "inquirer";
 import yargs from "yargs";
 import chalk from "chalk";
@@ -110,7 +112,6 @@ async function run() {
             img: "images",
         };
     }
-    console.log(assets)
 
     const answers = {
         name: project.name,

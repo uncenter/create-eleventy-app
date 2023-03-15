@@ -9,6 +9,9 @@
     },
     "type": "module",
     "exports": "./index.js",
+    "bin": {
+        "create-eleventy-app": "./index.js"
+    },
     "dependencies": {
         "chalk": "^5.2.0",
         "fs": "^0.0.1-security",

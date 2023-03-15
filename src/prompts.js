@@ -1,4 +1,8 @@
 import { dirExists, generateOptions } from "./utils.js";
+import path from "path";
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const project = () => ({
     type: "input",
@@ -34,7 +38,7 @@ const bundles = () => ({
     type: "checkbox",
     name: "selected",
     message: "What bundles would you like to use?",
-    choices: generateOptions("./lib/addons/bundles/"),
+    choices: generateOptions(path.join(__dirname, "..", "/lib/addons/bundles/")),
 });
 
 const customizations = () => ([
@@ -42,40 +46,40 @@ const customizations = () => ([
         type: "checkbox",
         name: "filters",
         message: "What filters would you like to use?",
-        choices: generateOptions("./lib/addons/filters/"),
+        choices: generateOptions(path.join(__dirname, "..", "/lib/addons/filters/")),
         loop: false,
     },
     {
         type: "checkbox",
         name: "shortcodes",
         message: "What shortcodes would you like to use?",
-        choices: generateOptions("./lib/addons/shortcodes/"),
+        choices: generateOptions(path.join(__dirname, "..", "/lib/addons/shortcodes/")),
         loop: false,
     },
     {
         type: "checkbox",
         name: "collections",
         message: "What collections would you like to use?",
-        choices: generateOptions("./lib/addons/collections/"),
+        choices: generateOptions(path.join(__dirname, "..", "/lib/addons/collections/")),
         loop: false,
     },
     {
         type: "checkbox",
         name: "eleventyPlugins",
         message: "What plugins would you like to use?",
-        choices: generateOptions("./lib/plugins/eleventy.json"),
+        choices: generateOptions(path.join(__dirname, "..", "/lib/plugins/eleventy.json")),
     },
     {
         type: "checkbox",
         name: "markdownPlugins",
         message: "What Markdown plugins would you like to use?",
-        choices: generateOptions("./lib/plugins/markdown.json"),
+        choices: generateOptions(path.join(__dirname, "..", "/lib/plugins/markdown.json")),
     },
     // {
     //     type: "checkbox",
     //     name: "pages",
     //     message: "What page templates would you like to add?",
-    //     choices: generateOptions("./lib/files/pages/"),
+    //     choices: generateOptions("/lib/files/pages/"),
     // }
 ]);
 
