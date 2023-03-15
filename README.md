@@ -1,32 +1,31 @@
-# create-eleventy-app
+<h1 align='center'>create-eleventy-app</h1>
 
-A CLI tool to create a new Eleventy site (in development).
+<p align="center">
+An unofficial (and unopinionated) CLI for creating Eleventy projects.
+</p>
 
-## To-do
-Roughly in order of priority:
+<img src="./demo.png" alt="A screenshot of the default starter project created by create-eleventy-app" width="100%">
 
-- [ ] Add more plugins (with configuration), shortcodes, filters, collections
-- [x] Assets handling configuration?
-- [ ] Implement Tailwind and SASS support
-    - Edit package.json scripts for this purpose?
-- [ ] Add complete starter projects
-    - [ ] Minimal
-    - [ ] Blog
-    - [ ] Docs
-    - [ ] Notes
-- [ ] Improve bundles and add new ones
-- [ ] Remove duplicate imports from config file
-    - Filters, shortcodes, and collections provide their own imports, but some may already be imported in the config file (e.g. markdown-it)
-- [ ] Clean up wording of prompts
-
-Little things:
-- [ ] Change paths in the generated README to match the user's input in the prompts
 ---
 
 ## Installation
 
-NOT YET PUBLISHED
-
 ```sh
 npm install -g create-eleventy-app
 ```
+
+## Usage
+
+```sh
+create-eleventy-app
+```
+
+## Options
+
+#### `--silent`
+
+Silence the output of the CLI.
+
+#### `--verbose`
+
+Show verbose output of the CLI.
