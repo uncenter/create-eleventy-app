@@ -2,9 +2,9 @@ import { slugify, deslugify, splitPath } from "./utils.js";
 import { debundle, addAddon, removeDefaultPath } from "./utils.js";
 import fs from "fs";
 import path from "path";
-import beautify from "js-beautify";
 import chalk from "chalk";
 import child_process from "child_process";
+import prettier from "prettier";
 import ProgressBar from "progress";
 import * as url from 'url';
 const __filename = url.fileURLToPath(import.meta.url);
@@ -148,7 +148,12 @@ export function generateProject(answers, options) {
     });
 
     // Write config file
-    fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties, assets), { indent_size: 4 }), function (err) {
+    fs.writeFileSync(path.join(projectDirectory, properties.configFile), prettier.format(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties, assets), {
+        tabWidth: 2,
+        printWidth: 80,
+        trailingComma: "all",
+        semi: true
+    }), function (err) {
         if (err) throw err;
     });
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
@@ -188,7 +193,7 @@ export function generateProject(answers, options) {
         removeDefaultPath('href="css/style.css"', 'href="/${assets.css}/style.css"', path.join(projectDirectory, properties.input, properties.includes, "base.njk"));
     }
     // Create package.json and install dependencies
-    fs.writeFileSync(path.join(projectDirectory, "package.json"), beautify(`{
+    fs.writeFileSync(path.join(projectDirectory, "package.json"), prettier.format(`{
         "name": "${name}",
         "private": true,
         "version": "1.0.0",
@@ -202,7 +207,12 @@ export function generateProject(answers, options) {
         "author": "",
         "license": "MIT",
         "dependencies": {}
-    }`, { indent_size: 4 }), function (err) {
+    }`, {
+        tabWidth: 2,
+        printWidth: 80,
+        trailingComma: "all",
+        semi: true
+    }), function (err) {
         if (err) throw err;
     });
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);

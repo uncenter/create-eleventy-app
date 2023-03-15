@@ -16,9 +16,9 @@
         "chalk": "^5.2.0",
         "fs": "^0.0.1-security",
         "inquirer": "^9.1.4",
-        "js-beautify": "^1.14.7",
         "lodash": "^4.17.21",
         "path": "^0.12.7",
+        "prettier": "^2.8.4",
         "progress": "^2.0.3",
         "yargs": "^17.7.1"
     }
