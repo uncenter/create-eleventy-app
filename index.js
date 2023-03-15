@@ -10,7 +10,7 @@ import { prompts } from "./src/prompts.js";
 import { queryPackage } from "./src/utils.js";
 
 const __name = "create-eleventy-app";
-const __version = "0.1.0";
+const __version = "1.0.0";
 
 const argv = yargs(process.argv.slice(2))
     .version(__version)
@@ -54,7 +54,7 @@ if (argv.set !== "latest") {
 
 async function run() {
     if (!argv.silent) {
-        console.log(chalk.green("\nWelcome to", chalk.underline.bold(lodash.startCase(__name)), "v" + __version));
+        console.log(chalk.green("\nWelcome to", chalk.underline.bold(lodash.startCase(__name))));
         console.log(`\nTo get started, please answer the following questions (you can always change these settings later).\nIf you are unsure about any of the questions, you can press ${chalk.bold("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
     }
     const project = await inquirer.prompt(prompts.project);
