@@ -6,8 +6,7 @@ A CLI tool to create a new Eleventy site (in development).
 Roughly in order of priority:
 
 - [ ] Add more plugins (with configuration), shortcodes, filters, collections
-- [ ] Assets handling configuration?
-    - Currently it just creates `css`, `img`, and `js` directories in the input directory. Add multiple options for this such as an assets directory (`src/assets`), or a directory for each asset type (`src/css`, `src/img`, `src/js`).
+- [x] Assets handling configuration?
 - [ ] Implement Tailwind and SASS support
     - Edit package.json scripts for this purpose?
 - [ ] Add complete starter projects
