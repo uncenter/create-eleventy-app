@@ -60,7 +60,7 @@ export function setupAllPlugins(plugins, markdownPlugins) {
     return pluginsString + markdownPluginsString + `\televentyConfig.setLibrary("md", mdLib);\n`;
 };
 
-function createConfigFile(bundles, addonFilters, addonShortcodes, addonCollections, addonPlugins, addonMarkdownPlugins, properties) {
+function createConfigFile(bundles, addonFilters, addonShortcodes, addonCollections, addonPlugins, addonMarkdownPlugins, properties, assets) {
     if (bundles.length > 0) {
         for (let bundle of bundles) {
             const { plugins, filters, shortcodes, collections } = debundle(bundle);
@@ -78,14 +78,19 @@ function createConfigFile(bundles, addonFilters, addonShortcodes, addonCollectio
         extraImports.push(...(imports || []));
         extraSetup.push(func);
     }
+    if (assets.parent !== "") {
+        assets.parent += "/";
+    } else {
+        assets.parent = "";
+    }
     return (`${addAllPlugins(addonPlugins, addonMarkdownPlugins, extraImports)}
 module.exports = function (eleventyConfig) {
     ${setupAllPlugins(addonPlugins, addonMarkdownPlugins)}
     ${(extraSetup.length > 0) ? `// Filters, Shortcodes, and Collections\n${extraSetup.join('\n')}` : ""}
     // Passthrough Copy
-    eleventyConfig.addPassthroughCopy("${properties.input}/css");
-    eleventyConfig.addPassthroughCopy("${properties.input}/js");
-    eleventyConfig.addPassthroughCopy("${properties.input}/img");
+    eleventyConfig.addPassthroughCopy("${properties.input}/${assets.parent}${assets.css}");
+    eleventyConfig.addPassthroughCopy("${properties.input}/${assets.parent}${assets.js}");
+    eleventyConfig.addPassthroughCopy("${properties.input}/${assets.parent}${assets.img}");
 
     return {
         dir: {
@@ -140,7 +145,7 @@ export function generateProject(answers, options) {
     });
 
     // Write config file
-    fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties), { indent_size: 4 }), function (err) {
+    fs.writeFileSync(path.join(projectDirectory, properties.configFile), beautify(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties, assets), { indent_size: 4 }), function (err) {
         if (err) throw err;
     });
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
