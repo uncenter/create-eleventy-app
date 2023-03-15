@@ -1,5 +1,5 @@
 import { slugify, deslugify, splitPath } from "./utils.js";
-import { debundle, addAddon } from "./utils.js";
+import { debundle, addAddon, removeDefaultPath } from "./utils.js";
 import fs from "fs";
 import path from "path";
 import beautify from "js-beautify";
@@ -179,7 +179,14 @@ export function generateProject(answers, options) {
         fs.copyFileSync(path.join(__dirname, "..", "/lib/files", source), path.join(projectDirectory, filesToCopy[source]));
         if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, filesToCopy[source]))}`);
     }
-
+    removeDefaultPath(`<code>src/index.md</code>`, `<code>${properties.input}/index.md</code>`, path.join(projectDirectory, properties.input, "index.md"));
+    if (assets.parent !== "") {
+        removeDefaultPath('src="img/logo.png"', path.normalize(`src="${assets.parent}/${assets.img}/logo.png"`), path.join(projectDirectory, properties.input, "index.md"));
+        removeDefaultPath('href="css/style.css"', path.normalize(`href="${assets.parent}/${assets.css}/style.css"`), path.join(projectDirectory, properties.input, properties.includes, "base.njk"));
+    } else {
+        removeDefaultPath('src="img/logo.png"', 'src="/${assets.img}/logo.png"', path.join(projectDirectory, properties.input, "index.md"));
+        removeDefaultPath('href="css/style.css"', 'href="/${assets.css}/style.css"', path.join(projectDirectory, properties.input, properties.includes, "base.njk"));
+    }
     // Create package.json and install dependencies
     fs.writeFileSync(path.join(projectDirectory, "package.json"), beautify(`{
         "name": "${name}",

@@ -106,6 +106,14 @@ export async function queryPackage(packageName, version = null) {
     return { name: data.name, description: data.description, version: getLatestVersion(), versions: getAllVersions() };
 }
 
+export function removeDefaultPath(def, custom, filepath) {
+    let content = fs.readFileSync(filepath, "utf8").toString();
+    while (content.includes(def)) {
+        content = content.replace(def, custom);
+    }
+    fs.writeFileSync(filepath, content);
+}
+
 export function removeDuplicateImports(file) {
     const uniqueImports = [];
     const imports = file.match(/const .* = require\(".*"\);/g);
