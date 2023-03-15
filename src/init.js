@@ -1,13 +1,14 @@
-import { slugify, deslugify, splitPath } from "./utils.js";
-import { debundle, addAddon, removeDefaultPath } from "./utils.js";
+import { slugify, deslugify, splitPath, debundle, addAddon } from "./utils.js";
+
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import child_process from "child_process";
 import prettier from "prettier";
 import ProgressBar from "progress";
+import Handlebars from "handlebars";
+
 import * as url from 'url';
-const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export function addAllPlugins(plugins, markdownPlugins, extraImports) {
@@ -107,20 +108,20 @@ module.exports = function (eleventyConfig) {
 };
 
 export function generateProject(answers, options) {
-    const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties, assets } = answers;
+    const { project, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties, assets } = answers;
 
     const restoreLog = console.log;
     if (options.silent) {
         console.log = () => { };
     }
-    // Generate project directory and subdirectories
-    const projectDirectory = slugify(name);
+
+    const projectDirectory = slugify(project);
     const inputDirectory = path.join(projectDirectory, properties.input);
-    console.log(`\nGenerating project in ${chalk.blue(path.resolve(projectDirectory))}.`); // 🚀
+    console.log(`\nGenerating project in ${chalk.blue(path.resolve(projectDirectory))}.`);
     fs.mkdirSync(projectDirectory);
     fs.mkdirSync(inputDirectory);
     if (options.verbose) {
-        console.log(`\nCreating some directories...`); // 🔨
+        console.log(`\nCreating some directories...`);
         console.log(`- ${chalk.dim(projectDirectory)}`);
         console.log(`- ${chalk.dim(inputDirectory)}`);
     }
@@ -147,33 +148,24 @@ export function generateProject(answers, options) {
         }
     });
 
-    // Write config file
     fs.writeFileSync(path.join(projectDirectory, properties.configFile), prettier.format(createConfigFile(bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, properties, assets), {
         tabWidth: 2,
         printWidth: 80,
         trailingComma: "all",
-        semi: true
+        semi: true,
+        parser: "babel",
     }), function (err) {
         if (err) throw err;
     });
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
 
-    // Copy template files
-    if (options.verbose) console.log(`\nCopying files...`); // 📥
+    if (options.verbose) console.log(`\nCopying files...`);
     const filesToCopy = {
         ".gitignoreFile": ".gitignore",
-        "README.md": "README.md",
-        "index.md": path.join(properties.input, "index.md"),
         "site.json": path.join(properties.input, properties.data, "site.json"),
-        "base.njk": path.join(properties.input, properties.includes, "base.njk"),
-    }
-    if (assets.parent !== "") {
-        filesToCopy["logo.png"] = path.join(properties.input, assets.parent, assets.img, "logo.png");
-        filesToCopy["style.css"] = path.join(properties.input, assets.parent, assets.css, "style.css");
-    } else {
-        filesToCopy["logo.png"] = path.join(properties.input, assets.img, "logo.png");
-        filesToCopy["style.css"] = path.join(properties.input, assets.css, "style.css");
-    }
+        "logo.png": path.join(properties.input, assets.parent, assets.img, "logo.png"),
+        "style.css": path.join(properties.input, assets.parent, assets.css, "style.css"),
+    };
     if (pages) {
         pages.forEach((page) => {
             page = slugify(page);
@@ -184,38 +176,34 @@ export function generateProject(answers, options) {
         fs.copyFileSync(path.join(__dirname, "..", "/lib/files", source), path.join(projectDirectory, filesToCopy[source]));
         if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, filesToCopy[source]))}`);
     }
-    removeDefaultPath(`<code>src/index.md</code>`, `<code>${properties.input}/index.md</code>`, path.join(projectDirectory, properties.input, "index.md"));
-    if (assets.parent !== "") {
-        removeDefaultPath('src="img/logo.png"', path.normalize(`src="${assets.parent}/${assets.img}/logo.png"`), path.join(projectDirectory, properties.input, "index.md"));
-        removeDefaultPath('href="css/style.css"', path.normalize(`href="${assets.parent}/${assets.css}/style.css"`), path.join(projectDirectory, properties.input, properties.includes, "base.njk"));
-    } else {
-        removeDefaultPath('src="img/logo.png"', 'src="/${assets.img}/logo.png"', path.join(projectDirectory, properties.input, "index.md"));
-        removeDefaultPath('href="css/style.css"', 'href="/${assets.css}/style.css"', path.join(projectDirectory, properties.input, properties.includes, "base.njk"));
-    }
-    // Create package.json and install dependencies
-    fs.writeFileSync(path.join(projectDirectory, "package.json"), prettier.format(`{
-        "name": "${name}",
-        "private": true,
-        "version": "1.0.0",
-        "description": "A new Eleventy project",
-        "main": "${properties.configFile}",
-        "scripts": {
-            "clean": "rm -rf ${properties.output}",
-            "start": "eleventy --serve",
-            "build": "eleventy"
+    const handlebarsData = {
+        project: project,
+        input: properties.input,
+        output: properties.output,
+        assets: {
+            img: path.join(assets.parent, assets.img),
+            css: path.join(assets.parent, assets.css),
+            js: path.join(assets.parent, assets.js),
         },
-        "author": "",
-        "license": "MIT",
-        "dependencies": {}
-    }`, {
-        tabWidth: 2,
-        printWidth: 80,
-        trailingComma: "all",
-        semi: true
-    }), function (err) {
-        if (err) throw err;
-    });
-    if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
+        configFile: properties.configFile,
+        includes: properties.includes,
+        data: properties.data,
+    };
+    var templateREADME = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/README.md.hbs"), "utf8").toString());
+    var templateIndex = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/index.md.hbs"), "utf8").toString());
+    var templateBase = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/base.njk.hbs"), "utf8").toString());
+    var templatePackageJson = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/package.json.hbs"), "utf8").toString());
+    fs.writeFileSync(path.join(projectDirectory, "README.md"), templateREADME(handlebarsData));
+    fs.writeFileSync(path.join(projectDirectory, properties.input, "index.md"), templateIndex(handlebarsData));
+    fs.writeFileSync(path.join(projectDirectory, properties.input, properties.includes, "base.njk"), templateBase(handlebarsData));
+    fs.writeFileSync(path.join(projectDirectory, "package.json"), templatePackageJson(handlebarsData));
+    if (options.verbose) {
+        console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
+        console.log(`- ${chalk.dim(path.join(projectDirectory, "README.md"))}`);
+        console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "index.md"))}`);
+        console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, properties.includes, "base.njk"))}`);
+    }
+
     if (!options.noinstall) {
         const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@' + options.set];
         var bar = new ProgressBar('[:bar] :percent', {
@@ -224,7 +212,7 @@ export function generateProject(answers, options) {
             width: 30,
             total: allDependencies.length
         });
-        console.log(`\nInstalling dependencies...\n`); // 📦
+        console.log(`\nInstalling dependencies...\n`);
         console.log = restoreLog;
         for (let dependency of allDependencies) {
             child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
@@ -232,13 +220,13 @@ export function generateProject(answers, options) {
         }
 
         if (framework !== null && framework !== undefined) {
-            console.log(`\nAdding ${chalk.blue(framework)}...`); // 🎨
+            console.log(`\nAdding ${chalk.blue(framework)}...`);
         }
     } else {
         console.log(`\nDependencies not installed (expected, since --noinstall was passed).`);
     }
-    // Print success message
+
     console.log(`\n${chalk.green.bold("✔️ Success!")} Project generation complete.`);
-    console.log(`\n${chalk.cyan.bold("Next steps:")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}`); // 🔥
+    console.log(`\n${chalk.cyan.bold("Next steps:")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}`);
     console.log(`\n${chalk.yellow("Note:")} To close the server, press ${chalk.bold("Ctrl + C")}.`);
 };

@@ -1,8 +1,8 @@
 import lodash from "lodash";
 import fs from "fs";
 import path from "path";
+
 import * as url from 'url';
-const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export function deslugify(string) {
@@ -104,25 +104,4 @@ export async function queryPackage(packageName, version = null) {
         return Object.keys(data.versions);
     }
     return { name: data.name, description: data.description, version: getLatestVersion(), versions: getAllVersions() };
-}
-
-export function removeDefaultPath(def, custom, filepath) {
-    let content = fs.readFileSync(filepath, "utf8").toString();
-    while (content.includes(def)) {
-        content = content.replace(def, custom);
-    }
-    fs.writeFileSync(filepath, content);
-}
-
-export function removeDuplicateImports(file) {
-    const uniqueImports = [];
-    const imports = file.match(/const .* = require\(".*"\);/g);
-    for (let imp of imports) {
-        if (!uniqueImports.includes(imp)) {
-            uniqueImports.push(imp);
-        } else {
-            file = file.replace(imp, "");
-        }
-    }
-    return file;
 }

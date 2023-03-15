@@ -114,7 +114,7 @@ async function run() {
     }
 
     const answers = {
-        name: project.name,
+        project: project.name,
         framework: framework.answer,
         bundles: bundles.selected,
         filters: customizations.filters,

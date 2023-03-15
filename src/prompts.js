@@ -1,7 +1,8 @@
 import { dirExists, generateOptions } from "./utils.js";
+
 import path from "path";
+
 import * as url from 'url';
-const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const project = () => ({
