@@ -100,24 +100,23 @@ export function generateProject(answers, options) {
 
     const restoreLog = console.log;
     if (options.silent) {
-        console.log("🤫 Generating project silently...");
         console.log = () => { };
     }
     // Generate project directory and subdirectories
     const projectDirectory = slugify(name);
     const inputDirectory = path.join(projectDirectory, properties.input);
-    console.log(`\n🚀 Generating project in ${chalk.blue(path.resolve(projectDirectory))}.`);
-    console.log(`\n🔨 Creating some directories...`);
+    console.log(`\nGenerating project in ${chalk.blue(path.resolve(projectDirectory))}.`); // 🚀
     fs.mkdirSync(projectDirectory);
     fs.mkdirSync(inputDirectory);
     if (options.verbose) {
+        console.log(`\nCreating some directories...`); // 🔨
         console.log(`- ${chalk.dim(projectDirectory)}`);
         console.log(`- ${chalk.dim(inputDirectory)}`);
     }
     const dirs = [properties.data, properties.includes, 'css', 'js', 'img'];
     dirs.forEach((dir) => {
         fs.mkdirSync(path.join(inputDirectory, dir));
-        if (options.silent) {
+        if (options.verbose) {
             console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
         }
     });
@@ -129,7 +128,7 @@ export function generateProject(answers, options) {
     if (options.verbose) console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
 
     // Copy template files
-    console.log(`📥 Copying files...`);
+    if (options.verbose) console.log(`\nCopying files...`); // 📥
     const filesToCopy = {
         ".gitignore": ".gitignore",
         "README.md": "README.md",
@@ -151,7 +150,6 @@ export function generateProject(answers, options) {
     }
 
     // Create package.json and install dependencies
-    console.log(`📝 Writing package.json...`);
     fs.writeFileSync(path.join(projectDirectory, "package.json"), beautify(`{
         "name": "${name}",
         "private": true,
@@ -173,26 +171,26 @@ export function generateProject(answers, options) {
     if (!options.noinstall) {
         const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@' + options.set];
         var bar = new ProgressBar('[:bar] :percent', {
-            complete: '=',
-            incomplete: ' ',
+            complete: '#',
+            incomplete: '-',
             width: 20,
             total: allDependencies.length
         });
-        console.log(`\n📦 Installing dependencies...\n`);
+        console.log(`\nInstalling dependencies...\n`); // 📦
         console.log = restoreLog;
         for (let dependency of allDependencies) {
             child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
             bar.tick();
         }
-        console.log('\n✅ Dependencies installed.');
 
         if (framework !== null && framework !== undefined) {
-            console.log(`\n🎨 Adding ${chalk.blue(framework)}...`);
+            console.log(`\nAdding ${chalk.blue(framework)}...`); // 🎨
         }
     } else {
-        console.log(`\n❌ Dependencies not installed (expected, since --noinstall was passed).`);
+        console.log(`\nDependencies not installed (expected, since --noinstall was passed).`);
     }
     // Print success message
-    console.log(`\n${chalk.green.bold("⭐ Success!")} Project generation complete!`);
-    console.log(`\n${chalk.cyan("🔥 Next steps!")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}\n`);
+    console.log(`\n${chalk.green.bold("✔️ Success!")} Project generation complete.`);
+    console.log(`\n${chalk.cyan.bold("Next steps:")} \n\n- ${chalk.bold("cd", projectDirectory)} \n- ${chalk.bold("npm start")} \n- ${chalk.underline("https://www.11ty.dev/docs/")}`); // 🔥
+    console.log(`\n${chalk.yellow("Note:")} To close the server, press ${chalk.bold("Ctrl + C")}.`);
 };

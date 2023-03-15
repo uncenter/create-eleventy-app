@@ -52,8 +52,8 @@ if (argv.set !== "latest") {
 
 async function run() {
     if (!argv.silent) {
-        console.log(chalk.green("\n👋  Welcome to", chalk.underline.bold(lodash.startCase(__name)), "v" + __version));
-        console.log(`\n✨ To get started, please answer the following questions (you can always change these settings later).\n🙋 If you are unsure about any of the questions, you can press ${chalk.bold("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
+        console.log(chalk.green("\nWelcome to", chalk.underline.bold(lodash.startCase(__name)), "v" + __version));
+        console.log(`\nTo get started, please answer the following questions (you can always change these settings later).\nIf you are unsure about any of the questions, you can press ${chalk.bold("Enter")} to accept the default value (${chalk.italic("recommended for first-time users")}).\n`);
     }
     const project = await inquirer.prompt(prompts.project);
     const quickstart = await inquirer.prompt(prompts.quickstart);
