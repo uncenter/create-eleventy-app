@@ -127,13 +127,11 @@ export function generateProject(answers, options) {
     if (assets.parent !== "") fs.mkdirSync(path.join(inputDirectory, assets.parent));
     assetDirs.forEach((dir) => {
         if (assets.parent !== "") {
-            console.log("Parent: " + assets.parent)
             fs.mkdirSync(path.join(inputDirectory, assets.parent, dir));
             if (options.verbose) {
                 console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, assets.parent, dir))}`);
             }
         } else {
-            console.log("No parent")
             fs.mkdirSync(path.join(inputDirectory, dir));
             if (options.verbose) {
                 console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
@@ -196,9 +194,9 @@ export function generateProject(answers, options) {
     if (!options.noinstall) {
         const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@' + options.set];
         var bar = new ProgressBar('[:bar] :percent', {
-            complete: '#',
-            incomplete: '-',
-            width: 20,
+            complete: '▓',
+            incomplete: '░',
+            width: 30,
             total: allDependencies.length
         });
         console.log(`\nInstalling dependencies...\n`); // 📦
