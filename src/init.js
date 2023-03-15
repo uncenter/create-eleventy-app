@@ -156,7 +156,7 @@ export function generateProject(answers, options) {
     // Copy template files
     if (options.verbose) console.log(`\nCopying files...`); // 📥
     const filesToCopy = {
-        ".gitignore": ".gitignore",
+        ".gitignoreFile": ".gitignore",
         "README.md": "README.md",
         "index.md": path.join(properties.input, "index.md"),
         "site.json": path.join(properties.input, properties.data, "site.json"),
