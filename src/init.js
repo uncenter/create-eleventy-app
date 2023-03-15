@@ -29,6 +29,9 @@ export function addAllPlugins(plugins, markdownPlugins, extraImports) {
 export function setupAllPlugins(plugins, markdownPlugins) {
     const pluginOptions = JSON.parse(fs.readFileSync("./lib/plugins/eleventy.json", "utf8"));
     let pluginsString = "// Eleventy Plugins\n";
+    if (plugins.length === 0) {
+        pluginsString = "";
+    }
     for (let plugin of plugins) {
         if (pluginOptions[plugin].options !== "") {
             pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, { ${pluginOptions[plugin].options} });\n`;
@@ -96,7 +99,7 @@ module.exports = function (eleventyConfig) {
 };
 
 export function generateProject(answers, options) {
-    const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties } = answers;
+    const { name, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties, assets } = answers;
 
     const restoreLog = console.log;
     if (options.silent) {
@@ -113,11 +116,28 @@ export function generateProject(answers, options) {
         console.log(`- ${chalk.dim(projectDirectory)}`);
         console.log(`- ${chalk.dim(inputDirectory)}`);
     }
-    const dirs = [properties.data, properties.includes, 'css', 'js', 'img'];
+    const dirs = [properties.data, properties.includes];
     dirs.forEach((dir) => {
         fs.mkdirSync(path.join(inputDirectory, dir));
         if (options.verbose) {
             console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
+        }
+    });
+    const assetDirs = [assets.css, assets.js, assets.img];
+    if (assets.parent !== "") fs.mkdirSync(path.join(inputDirectory, assets.parent));
+    assetDirs.forEach((dir) => {
+        if (assets.parent !== "") {
+            console.log("Parent: " + assets.parent)
+            fs.mkdirSync(path.join(inputDirectory, assets.parent, dir));
+            if (options.verbose) {
+                console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, assets.parent, dir))}`);
+            }
+        } else {
+            console.log("No parent")
+            fs.mkdirSync(path.join(inputDirectory, dir));
+            if (options.verbose) {
+                console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
+            }
         }
     });
 
@@ -134,9 +154,14 @@ export function generateProject(answers, options) {
         "README.md": "README.md",
         "index.md": path.join(properties.input, "index.md"),
         "site.json": path.join(properties.input, properties.data, "site.json"),
-        "style.css": path.join(properties.input, "css/style.css"),
         "base.njk": path.join(properties.input, properties.includes, "base.njk"),
-        "logo.png": path.join(properties.input, "img/logo.png")
+    }
+    if (assets.parent !== "") {
+        filesToCopy["logo.png"] = path.join(properties.input, assets.parent, assets.img, "logo.png");
+        filesToCopy["style.css"] = path.join(properties.input, assets.parent, assets.css, "style.css");
+    } else {
+        filesToCopy["logo.png"] = path.join(properties.input, assets.img, "logo.png");
+        filesToCopy["style.css"] = path.join(properties.input, assets.css, "style.css");
     }
     if (pages) {
         pages.forEach((page) => {

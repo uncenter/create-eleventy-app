@@ -61,6 +61,7 @@ async function run() {
     let bundles;
     let framework;
     let properties;
+    let assets;
     if (quickstart.answer) {
         bundles = await inquirer.prompt(prompts.bundles);
     } else {
@@ -72,10 +73,13 @@ async function run() {
         }
         const configureAdvanced = await inquirer.prompt(prompts.configureAdvanced);
 
-        let framework = {};
         if (configureAdvanced.answer) {
             // framework = await inquirer.prompt(prompts.framework);
             properties = await inquirer.prompt(prompts.properties);
+            const configureAssets = await inquirer.prompt(prompts.configureAssets);
+            if (configureAssets.answer) {
+                assets = await inquirer.prompt(prompts.assets);
+            }
         }
     }
     if (customizations === undefined) {
@@ -98,7 +102,15 @@ async function run() {
             includes: "_includes",
         };
     }
-
+    if (assets === undefined) {
+        assets = {
+            parent: "",
+            css: "css",
+            js: "js",
+            img: "images",
+        };
+    }
+    console.log(assets)
 
     const answers = {
         name: project.name,
@@ -110,7 +122,8 @@ async function run() {
         eleventyPlugins: customizations.eleventyPlugins,
         markdownPlugins: customizations.markdownPlugins,
         pages: customizations.pages,
-        properties: properties
+        properties: properties,
+        assets: assets,
     };
     generateProject(answers, argv);
 };

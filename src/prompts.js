@@ -133,6 +133,40 @@ const properties = () => ([
     },
 ]);
 
+const configureAssets = () => ({
+    type: "confirm",
+    name: "answer",
+    message: "Configure assets directory?",
+    default: false,
+});
+
+const assets = () => ([
+    {
+        type: "input",
+        name: "parent",
+        message: "Set parent assets directory?",
+        default: "assets",
+    },
+    {
+        type: "input",
+        name: "img",
+        message: "Set images directory?",
+        default: "img",
+    },
+    {
+        type: "input",
+        name: "js",
+        message: "Set scripts directory?",
+        default: "js",
+    },
+    {
+        type: "input",
+        name: "css",
+        message: "Set styles directory?",
+        default: "css",
+    },
+]);
+
 
 
 export const prompts = {
@@ -144,4 +178,6 @@ export const prompts = {
     configureAdvanced: configureAdvanced(),
     framework: framework(),
     properties: properties(),
+    configureAssets: configureAssets(),
+    assets: assets(),
 };
