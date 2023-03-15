@@ -1,7 +1,7 @@
 {
     "name": "create-eleventy-app",
     "author": "uncenter",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "Create an Eleventy app with a single command",
     "repository": {
         "type": "git",
