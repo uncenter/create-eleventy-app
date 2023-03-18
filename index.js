@@ -59,11 +59,23 @@ async function run() {
     }
     const project = await inquirer.prompt(prompts.project);
     const quickstart = await inquirer.prompt(prompts.quickstart);
-    let customizations;
-    let bundles;
-    let framework;
-    let properties;
-    let assets;
+
+    let customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
+    let bundles = { selected: [] };
+    let framework = { answer: null };
+    let properties = {
+        configFile: "eleventy.config.js",
+        output: "dist",
+        input: "src",
+        data: "_data",
+        includes: "_includes",
+    };
+    let assets = {
+        parent: "",
+        css: "css",
+        js: "js",
+        img: "images",
+    };
     if (quickstart.answer) {
         bundles = await inquirer.prompt(prompts.bundles);
     } else {
@@ -83,34 +95,6 @@ async function run() {
                 assets = await inquirer.prompt(prompts.assets);
             }
         }
-    }
-    if (customizations === undefined) {
-        customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
-    } else {
-        customizations.pages = [];
-    }
-    if (bundles === undefined) {
-        bundles = { selected: [] };
-    }
-    if (framework === undefined) {
-        framework = { answer: null };
-    }
-    if (properties === undefined) {
-        properties = {
-            configFile: "eleventy.config.js",
-            output: "dist",
-            input: "src",
-            data: "_data",
-            includes: "_includes",
-        };
-    }
-    if (assets === undefined) {
-        assets = {
-            parent: "",
-            css: "css",
-            js: "js",
-            img: "images",
-        };
     }
 
     const answers = {
