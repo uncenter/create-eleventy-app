@@ -1,4 +1,4 @@
-import { slugify, deslugify, splitPath, debundle, addAddon } from "./utils.js";
+import { debundle, addAddon } from "./utils.js";
 
 import fs from "fs";
 import path from "path";
@@ -7,13 +7,14 @@ import child_process from "child_process";
 import prettier from "prettier";
 import ProgressBar from "progress";
 import Handlebars from "handlebars";
+import lodash from "lodash";
 
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export function addAllPlugins(plugins, markdownPlugins, extraImports) {
     function addPlugin(plugin) {
-        return `const ${deslugify(splitPath(plugin))} = require("${plugin}");\n`;
+        return `const ${lodash.camelCase(path.parse(plugin).name)} = require("${plugin}");\n`;
     }
     let pluginsString = "// Imports\nconst markdownIt = require('markdown-it');\n";
     for (let plugin of plugins) {
@@ -37,10 +38,11 @@ export function setupAllPlugins(plugins, markdownPlugins) {
         pluginsString = "";
     }
     for (let plugin of plugins) {
+        const pluginName = lodash.camelCase(path.parse(plugin).name);
         if (pluginOptions[plugin].options !== "") {
-            pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))}, { ${pluginOptions[plugin].options} });\n`;
+            pluginsString += `eleventyConfig.addPlugin(${pluginName}, { ${pluginOptions[plugin].options} });\n`;
         } else {
-            pluginsString += `eleventyConfig.addPlugin(${deslugify(splitPath(plugin))});\n`;
+            pluginsString += `eleventyConfig.addPlugin(${pluginName});\n`;
         }
     }
     const markdownPluginOptions = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "/lib/plugins/markdown.json"), "utf8"));
@@ -49,13 +51,14 @@ export function setupAllPlugins(plugins, markdownPlugins) {
         breaks: true,
         linkify: true,
     })\n`;
-    for (let markdownPlugin of markdownPlugins) {
-        if (markdownPluginOptions[markdownPlugin].options !== "") {
-            markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))}, { ${markdownPluginOptions[markdownPlugin].options} })`;
+    for (let plugin of markdownPlugins) {
+        const pluginName = lodash.camelCase(path.parse(plugin).name);
+        if (markdownPluginOptions[plugin].options !== "") {
+            markdownPluginsString += `\t.use(${pluginName}, { ${markdownPluginOptions[plugin].options} })`;
         } else {
-            markdownPluginsString += `\t.use(${deslugify(splitPath(markdownPlugin))})`;
+            markdownPluginsString += `\t.use(${pluginName})`;
         }
-        if (markdownPlugin === markdownPlugins[markdownPlugins.length - 1]) {
+        if (plugin === markdownPlugins[markdownPlugins.length - 1]) {
             markdownPluginsString += ";\n";
         } else {
             markdownPluginsString += "\n";
@@ -115,7 +118,7 @@ export function generateProject(answers, options) {
         console.log = () => { };
     }
 
-    const projectDirectory = slugify(project);
+    const projectDirectory = lodash.kebabCase(project);
     const inputDirectory = path.join(projectDirectory, properties.input);
     console.log(`\nGenerating project in ${chalk.blue(path.resolve(projectDirectory))}.`);
     fs.mkdirSync(projectDirectory);
@@ -168,7 +171,7 @@ export function generateProject(answers, options) {
     };
     if (pages) {
         pages.forEach((page) => {
-            page = slugify(page);
+            page = lodash.kebabCase(page);
             filesToCopy[`${path.join("/pages", page)}.md`] = path.join(properties.input, `${page}.md`);
         });
     }

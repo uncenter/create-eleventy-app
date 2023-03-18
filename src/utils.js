@@ -5,18 +5,6 @@ import path from "path";
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-export function deslugify(string) {
-    return lodash.camelCase(string);
-}
-
-export function slugify(string) {
-    return lodash.kebabCase(string);
-}
-
-export function splitPath(pathString) {
-    return path.parse(pathString).name;
-}
-
 export function dirExists(pathString) {
     if (!fs.existsSync(pathString)) {
         return false;
