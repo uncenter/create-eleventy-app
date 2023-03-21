@@ -111,7 +111,7 @@ module.exports = function (eleventyConfig) {
 };
 
 export function generateProject(answers, options) {
-    const { project, framework, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties, assets } = answers;
+    const { project, bundles, filters, shortcodes, collections, eleventyPlugins, markdownPlugins, pages, properties, assets } = answers;
 
     const restoreLog = console.log;
     if (options.silent) {
@@ -209,7 +209,7 @@ export function generateProject(answers, options) {
 
     if (!options.noinstall) {
         const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@' + options.set];
-        var bar = new ProgressBar('[:bar] :percent', {
+        var bar = new ProgressBar('(:bar) :percent', {
             complete: '▓',
             incomplete: '░',
             width: 30,
@@ -220,10 +220,6 @@ export function generateProject(answers, options) {
         for (let dependency of allDependencies) {
             child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
             bar.tick();
-        }
-
-        if (framework !== null && framework !== undefined) {
-            console.log(`\nAdding ${chalk.blue(framework)}...`);
         }
     } else {
         console.log(`\nDependencies not installed (expected, since --noinstall was passed).`);

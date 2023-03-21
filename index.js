@@ -62,7 +62,6 @@ async function run() {
 
     let customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
     let bundles = { selected: [] };
-    let framework = { answer: null };
     let properties = {
         configFile: "eleventy.config.js",
         output: "dist",
@@ -88,7 +87,6 @@ async function run() {
         const configureAdvanced = await inquirer.prompt(prompts.configureAdvanced);
 
         if (configureAdvanced.answer) {
-            // framework = await inquirer.prompt(prompts.framework);
             properties = await inquirer.prompt(prompts.properties);
             const configureAssets = await inquirer.prompt(prompts.configureAssets);
             if (configureAssets.answer) {
@@ -99,7 +97,6 @@ async function run() {
 
     const answers = {
         project: project.name,
-        framework: framework.answer,
         bundles: bundles.selected,
         ...customizations,
         pages: customizations.pages,

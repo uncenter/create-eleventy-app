@@ -91,19 +91,6 @@ const configureAdvanced = () => ({
     default: false,
 });
 
-const framework = () => ({
-    type: "list",
-    name: "answer",
-    message: "Would you like to add a framework?",
-    choices: [
-        "None",
-        "Sass",
-        "Tailwind",
-        "Tailwind + Sass",
-    ],
-    default: "None",
-});
-
 const properties = () => ([
     {
         type: "list",
@@ -181,7 +168,6 @@ export const prompts = {
     useBundles: useBundles(),
     customizations: customizations(),
     configureAdvanced: configureAdvanced(),
-    framework: framework(),
     properties: properties(),
     configureAssets: configureAssets(),
     assets: assets(),
