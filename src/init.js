@@ -165,7 +165,6 @@ export function generateProject(answers, options) {
     if (options.verbose) console.log(`\nCopying files...`);
     const filesToCopy = {
         ".gitignoreFile": ".gitignore",
-        "site.json": path.join(properties.input, properties.data, "site.json"),
         "logo.png": path.join(properties.input, assets.parent, assets.img, "logo.png"),
         "style.css": path.join(properties.input, assets.parent, assets.css, "style.css"),
     };
@@ -181,6 +180,7 @@ export function generateProject(answers, options) {
     }
     const handlebarsData = {
         project: project,
+        domain: lodash.kebabCase(project),
         input: properties.input,
         output: properties.output,
         assets: {
@@ -196,15 +196,17 @@ export function generateProject(answers, options) {
     var templateIndex = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/index.md.hbs"), "utf8").toString());
     var templateBase = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/base.njk.hbs"), "utf8").toString());
     var templatePackageJson = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/package.json.hbs"), "utf8").toString());
+    var templateSiteJson = Handlebars.compile(fs.readFileSync(path.join(__dirname, "..", "/lib/files/site.json.hbs"), "utf8").toString());
     fs.writeFileSync(path.join(projectDirectory, "README.md"), templateREADME(handlebarsData));
     fs.writeFileSync(path.join(projectDirectory, properties.input, "index.md"), templateIndex(handlebarsData));
     fs.writeFileSync(path.join(projectDirectory, properties.input, properties.includes, "base.njk"), templateBase(handlebarsData));
     fs.writeFileSync(path.join(projectDirectory, "package.json"), templatePackageJson(handlebarsData));
+    fs.writeFileSync(path.join(projectDirectory, properties.input, properties.data, "site.json"), templateSiteJson(handlebarsData));
     if (options.verbose) {
-        console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
         console.log(`- ${chalk.dim(path.join(projectDirectory, "README.md"))}`);
         console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, "index.md"))}`);
         console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, properties.includes, "base.njk"))}`);
+        console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
     }
 
     if (!options.noinstall) {
