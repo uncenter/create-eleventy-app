@@ -120,7 +120,7 @@ export function generateProject(answers, options) {
 
     const projectDirectory = lodash.kebabCase(project);
     const inputDirectory = path.join(projectDirectory, properties.input);
-    console.log(`\nGenerating project in ${chalk.blue(path.resolve(projectDirectory))}.`);
+    console.log(`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(projectDirectory))}.`);
     fs.mkdirSync(projectDirectory);
     fs.mkdirSync(inputDirectory);
     if (options.verbose) {

@@ -8,7 +8,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const project = () => ({
     type: "input",
     name: "name",
-    message: "What would you like to name your project?",
+    message: "What is your project named?",
     default: "my-project",
     validate: (input) => {
         if (dirExists(input)) {
@@ -24,7 +24,7 @@ const project = () => ({
 const quickstart = () => ({
     type: "confirm",
     name: "answer",
-    message: "Quickstart? (recommended for first-time users)",
+    message: "Use quickstart?",
     default: true,
 });
 
