@@ -1,81 +1,40 @@
 #!/usr/bin/env node
 
 import inquirer from "inquirer";
-import yargs from "yargs";
-import chalk from "chalk";
-import lodash from "lodash";
 
 import { generateProject } from "./src/init.js";
 import { prompts } from "./src/prompts.js";
 import { queryPackage, dirExists } from "./src/utils.js";
+import { Command } from 'commander';
 
 const __name = "create-eleventy-app";
 const __version = "1.0.0";
 
-const argv = yargs(process.argv.slice(2))
-    .command("new", "Create a new Eleventy project", (yargs) => {
-        yargs.positional("name", {
-            describe: "Name of the project",
-            type: "string",
-        });
-    })
+const program = new Command();
+program
     .version(__version)
-    .option("verbose", {
-        alias: "v",
-        describe: "Print verbose output",
-        type: "boolean",
-        default: false,
-    })
-    .option("silent", {
-        alias: "s",
-        describe: "Silence all output",
-        type: "boolean",
-        default: false,
-    })
-    .option("set", {
-        alias: "e",
-        describe: "Use a specific version of Eleventy",
-        type: "string",
-        default: "latest",
-    })
-    .option("noinstall", {
-        alias: "n",
-        describe: "Do not install dependencies",
-        type: "boolean",
-        default: false,
-    })
-    .argv;
+    .option("-v, --verbose", "print verbose output", false)
+    .option("-s, --silent", "silence all output", false)
+    .option("-e, --set <version>", "use a specific version of Eleventy", "latest")
+    .option("-n, --no-install", "do not install dependencies")
 
-if (argv.verbose && argv.silent) {
+program.parse(process.argv);
+const options = program.opts();
+
+if (options.verbose && options.silent) {
     console.error("You cannot use both --verbose and --silent.");
     process.exit(1);
 }
-if (argv.set !== "latest") {
+if (options.set !== "latest") {
     const data = await queryPackage("@11ty/eleventy");
-    if (!data.versions.includes(argv.set)) {
-        console.error(`@11ty/eleventy@${argv.set} does not exist. Please use a valid version number (e.g. ${data.version}).`);
+    if (!data.versions.includes(options.set)) {
+        console.error(`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (e.g. ${data.version}).`);
         process.exit(1);
-    }
-}
-if (argv._[0] === "new") {
-    if (argv._[1]) {
-        if (dirExists(argv._[1])) {
-            console.error(`A directory with that name already exists.`);
-            process.exit(1);
-        }
-        if (!(argv._[1].trim() === "")) {
-            argv.name = argv._[1];
-        }
     }
 }
 
 async function run() {
-    let project;
-    if (!argv.name) {
-        project = await inquirer.prompt(prompts.project);
-    } else {
-        project = { name: argv.name };
-    }
+    const project = await inquirer.prompt(prompts.project);
     const quickstart = await inquirer.prompt(prompts.quickstart);
 
     let customizations = { filters: [], shortcodes: [], collections: [], eleventyPlugins: [], markdownPlugins: [], pages: [] };
@@ -88,10 +47,10 @@ async function run() {
         includes: "_includes",
     };
     let assets = {
-        parent: "",
+        parent: "assets",
         css: "css",
         js: "js",
-        img: "images",
+        img: "img",
     };
     if (quickstart.answer) {
         bundles = await inquirer.prompt(prompts.bundles);
@@ -121,7 +80,7 @@ async function run() {
         properties: properties,
         assets: assets,
     };
-    generateProject(answers, argv);
+    generateProject(answers, options);
 };
 
 run();

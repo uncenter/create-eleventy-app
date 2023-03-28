@@ -18,13 +18,13 @@
     },
     "dependencies": {
         "chalk": "^5.2.0",
+        "commander": "^10.0.0",
         "fs": "^0.0.1-security",
         "handlebars": "^4.7.7",
         "inquirer": "^9.1.4",
         "lodash": "^4.17.21",
         "path": "^0.12.7",
         "prettier": "^2.8.4",
-        "progress": "^2.0.3",
-        "yargs": "^17.7.1"
+        "progress": "^2.0.3"
     }
 }

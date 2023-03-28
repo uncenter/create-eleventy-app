@@ -209,7 +209,7 @@ export function generateProject(answers, options) {
         console.log(`- ${chalk.dim(path.join(projectDirectory, "package.json"))}`);
     }
 
-    if (!options.noinstall) {
+    if (options.install) {
         const allDependencies = [...eleventyPlugins, ...markdownPlugins, 'markdown-it', '@11ty/eleventy@' + options.set];
         var bar = new ProgressBar('(:bar) :percent', {
             complete: '▓',
@@ -224,7 +224,7 @@ export function generateProject(answers, options) {
             bar.tick();
         }
     } else {
-        console.log(`\nDependencies not installed (expected, since --noinstall was passed).`);
+        console.log(`\nDependencies not installed (expected, since --no-install was passed).`);
     }
 
     console.log(`\n${chalk.green.bold("✔️ Success!")} Project generation complete.`);
