@@ -1,35 +1,35 @@
 {
-    "markdown-it-anchor": {
-        "options": "permalink: markdownItAnchor.permalink.ariaHidden({ placement: 'after', class: 'header-anchor', symbol: '#', ariaHidden: false, }), level: [1, 2, 3, 4], slugify: eleventyConfig.getFilter('slugify')"
-    },
-    "markdown-it-emoji": {
-        "options": ""
-    },
-    "markdown-it-footnote": {
-        "options": ""
-    },
-    "markdown-it-kbd": {
-        "options": ""
-    },
-    "markdown-it-link-attributes": {
-        "options": "matcher(href, config) { return href.startsWith('https:'); }, attrs: { target: '_blank', rel: 'noopener noreferrer' }"
-    },
-    "markdown-it-sub": {
-        "options": ""
-    },
-    "markdown-it-sup": {
-        "options": ""
-    },
-    "markdown-it-task-checkbox": {
-        "options": "disabled: true, divWrap: false, idPrefix: '', ulClass: 'checklist', liClass: 'checklist-item'"
-    },
-    "markdown-it-abbr": {
-        "options": ""
-    },
-    "markdown-it-mark": {
-        "options": ""
-    },
-    "markdown-it-attrs": {
-        "options": ""
-    }
+	"markdown-it-anchor": {
+		"options": "permalink: markdownItAnchor.permalink.ariaHidden({ placement: 'after', class: 'header-anchor', symbol: '#', ariaHidden: false, }), level: [1, 2, 3, 4], slugify: eleventyConfig.getFilter('slugify')"
+	},
+	"markdown-it-emoji": {
+		"options": ""
+	},
+	"markdown-it-footnote": {
+		"options": ""
+	},
+	"markdown-it-kbd": {
+		"options": ""
+	},
+	"markdown-it-link-attributes": {
+		"options": "matcher(href, config) { return href.startsWith('https:'); }, attrs: { target: '_blank', rel: 'noopener noreferrer' }"
+	},
+	"markdown-it-sub": {
+		"options": ""
+	},
+	"markdown-it-sup": {
+		"options": ""
+	},
+	"markdown-it-task-checkbox": {
+		"options": "disabled: true, divWrap: false, idPrefix: '', ulClass: 'checklist', liClass: 'checklist-item'"
+	},
+	"markdown-it-abbr": {
+		"options": ""
+	},
+	"markdown-it-mark": {
+		"options": ""
+	},
+	"markdown-it-attrs": {
+		"options": ""
+	}
 }
