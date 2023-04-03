@@ -288,6 +288,7 @@ export function generateProject(answers, options) {
 			...markdownPlugins,
 			'markdown-it',
 			'@11ty/eleventy@' + options.set,
+			'rimraf',
 		];
 		var bar = new ProgressBar(':bar :percent', {
 			complete: '▓',
