@@ -1,6 +1,6 @@
 {
-    "plugins": [],
-    "filters": ["htmlDateString", "readableDate"],
-    "shortcodes": [],
-    "collections": []
+	"plugins": [],
+	"filters": ["htmlDateString", "readableDate"],
+	"shortcodes": [],
+	"collections": []
 }
