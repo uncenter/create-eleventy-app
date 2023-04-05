@@ -24,9 +24,12 @@
 		"inquirer": "^9.1.4",
 		"lodash": "^4.17.21",
 		"path": "^0.12.7",
-		"progress": "^2.0.3"
+		"progress": "^2.0.3",
+		"update-notifier": "^6.0.2"
 	},
 	"devDependencies": {
+		"@babel/eslint-parser": "^7.21.3",
+		"@babel/plugin-syntax-import-assertions": "^7.20.0",
 		"eslint": "^8.37.0",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-prettier": "^4.2.1",

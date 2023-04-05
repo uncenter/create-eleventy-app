@@ -1,7 +1,9 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --no-warnings
 
 import inquirer from 'inquirer';
 import path from 'path';
+import updateNotifier from 'update-notifier';
+import packageJson from './package.json' assert { type: 'json' };
 
 import { generateProject } from './src/init.js';
 import { prompts } from './src/prompts.js';
@@ -12,6 +14,21 @@ import { generateOptions } from './src/utils.js';
 import * as url from 'url';
 const __version = '1.0.0';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+const notifier = updateNotifier({
+	pkg: packageJson,
+	updateCheckInterval: 1000 * 60 * 60 * 12,
+	isGlobal: true,
+	boxenOptions: {
+		padding: 1,
+		margin: 1,
+		textAlignment: 'center',
+		borderColor: 'cyan',
+		borderStyle: 'bold',
+	},
+});
+
+notifier.notify();
 
 const program = new Command();
 program
