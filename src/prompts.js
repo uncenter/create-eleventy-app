@@ -36,25 +36,19 @@ const customizations = () => [
 		choices: generateOptions(path.join(__dirname, '..', '/lib/addons/filters/')),
 		loop: false,
 	},
-	{
-		type: 'checkbox',
-		name: 'shortcodes',
-		message: 'What shortcodes would you like to use?',
-		choices: generateOptions(path.join(__dirname, '..', '/lib/addons/shortcodes/')),
-		loop: false,
-	},
-	{
-		type: 'checkbox',
-		name: 'collections',
-		message: 'What collections would you like to use?',
-		choices: generateOptions(path.join(__dirname, '..', '/lib/addons/collections/')),
-		loop: false,
-	},
 	// {
 	// 	type: 'checkbox',
-	// 	name: 'eleventyPlugins',
-	// 	message: 'What plugins would you like to use?',
-	// 	choices: generateOptions(path.join(__dirname, '..', '/lib/plugins/eleventy.json')),
+	// 	name: 'shortcodes',
+	// 	message: 'What shortcodes would you like to use?',
+	// 	choices: generateOptions(path.join(__dirname, '..', '/lib/addons/shortcodes/')),
+	// 	loop: false,
+	// },
+	// {
+	// 	type: 'checkbox',
+	// 	name: 'collections',
+	// 	message: 'What collections would you like to use?',
+	// 	choices: generateOptions(path.join(__dirname, '..', '/lib/addons/collections/')),
+	// 	loop: false,
 	// },
 	{
 		type: 'checkbox',
@@ -62,12 +56,6 @@ const customizations = () => [
 		message: 'What Markdown plugins would you like to use?',
 		choices: generateOptions(path.join(__dirname, '..', '/lib/plugins/markdown.json')),
 	},
-	// {
-	//     type: "checkbox",
-	//     name: "pages",
-	//     message: "What page templates would you like to add?",
-	//     choices: generateOptions("/lib/files/pages/"),
-	// }
 ];
 
 const configureAdvanced = () => ({
