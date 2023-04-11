@@ -38,13 +38,12 @@ export function addMarkdownConfiguration(plugins) {
     })\n`;
 	for (let plugin of plugins) {
 		const pluginName = lodash.camelCase(path.parse(plugin).name);
-		configuration += `\t.use(${pluginName})${
+		configuration += `.use(${pluginName})${
 			pluginOptions[plugin].options !== '' ? `, { ${pluginOptions[plugin].options} }` : ''
 		}`;
-		configuration +=
-			plugin === markdownPlugins[markdownPlugins.length - 1] ? ';\n' : '\n';
+		configuration += plugin === markdownPlugins[markdownPlugins.length - 1] ? ';' : '';
 	}
-	return configuration + `\televentyConfig.setLibrary("md", mdLib);\n`;
+	return configuration + `\neleventyConfig.setLibrary("md", mdLib);\n`;
 }
 
 function createConfigFile(
@@ -211,8 +210,26 @@ export function generateProject(answers, options) {
 		if (options.verbose)
 			console.log(`- ${chalk.dim(path.join(projectDirectory, filesToCopy[source]))}`);
 	}
+	const templates = {
+		'README.md.hbs': 'README.md',
+		'index.md.hbs': path.join(properties.input, 'index.md'),
+		'base.njk.hbs': path.join(properties.input, properties.includes, 'base.njk'),
+		'package.json.hbs': 'package.json',
+		'site.json.hbs': path.join(properties.input, properties.data, 'site.json'),
+	};
+	const compiledTemplates = Object.entries(templates).reduce(
+		(acc, [templateFile, outputFile]) => {
+			const templateSource = fs.readFileSync(
+				path.join(__dirname, '..', 'lib', 'files', templateFile),
+				'utf8',
+			);
+			acc[outputFile] = Handlebars.compile(templateSource);
+			return acc;
+		},
+		{},
+	);
 	const handlebarsData = {
-		project: project,
+		project,
 		domain: lodash.kebabCase(project),
 		input: properties.input,
 		output: properties.output,
@@ -225,51 +242,12 @@ export function generateProject(answers, options) {
 		includes: properties.includes,
 		data: properties.data,
 	};
-	var templateREADME = Handlebars.compile(
-		fs
-			.readFileSync(path.join(__dirname, '..', '/lib/files/README.md.hbs'), 'utf8')
-			.toString(),
-	);
-	var templateIndex = Handlebars.compile(
-		fs
-			.readFileSync(path.join(__dirname, '..', '/lib/files/index.md.hbs'), 'utf8')
-			.toString(),
-	);
-	var templateBase = Handlebars.compile(
-		fs
-			.readFileSync(path.join(__dirname, '..', '/lib/files/base.njk.hbs'), 'utf8')
-			.toString(),
-	);
-	var templatePackageJson = Handlebars.compile(
-		fs
-			.readFileSync(path.join(__dirname, '..', '/lib/files/package.json.hbs'), 'utf8')
-			.toString(),
-	);
-	var templateSiteJson = Handlebars.compile(
-		fs
-			.readFileSync(path.join(__dirname, '..', '/lib/files/site.json.hbs'), 'utf8')
-			.toString(),
-	);
-	fs.writeFileSync(
-		path.join(projectDirectory, 'README.md'),
-		templateREADME(handlebarsData),
-	);
-	fs.writeFileSync(
-		path.join(projectDirectory, properties.input, 'index.md'),
-		templateIndex(handlebarsData),
-	);
-	fs.writeFileSync(
-		path.join(projectDirectory, properties.input, properties.includes, 'base.njk'),
-		templateBase(handlebarsData),
-	);
-	fs.writeFileSync(
-		path.join(projectDirectory, 'package.json'),
-		templatePackageJson(handlebarsData),
-	);
-	fs.writeFileSync(
-		path.join(projectDirectory, properties.input, properties.data, 'site.json'),
-		templateSiteJson(handlebarsData),
-	);
+	Object.entries(compiledTemplates).forEach(([outputFile, compiledTemplate]) => {
+		fs.writeFileSync(
+			path.join(projectDirectory, outputFile),
+			compiledTemplate(handlebarsData),
+		);
+	});
 	if (options.verbose) {
 		console.log(`- ${chalk.dim(path.join(projectDirectory, 'README.md'))}`);
 		console.log(
