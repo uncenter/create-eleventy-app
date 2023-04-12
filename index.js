@@ -46,7 +46,7 @@ if (options.verbose && options.silent) {
 	console.error('You cannot use both --verbose and --silent.');
 	process.exit(1);
 }
-if (options.set !== 'latest') {
+if (options.set !== 'latest' || options.set !== 'next') {
 	const data = await queryPackage('@11ty/eleventy');
 	if (!data.versions.includes(options.set)) {
 		console.error(
