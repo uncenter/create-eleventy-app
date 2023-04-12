@@ -12,49 +12,50 @@ import lodash from 'lodash';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-export function addImports(plugins, imports) {
-	let pluginsString = "const markdownIt = require('markdown-it');";
+function addImports(plugins, imports) {
+	let pluginString = "const markdownIt = require('markdown-it');";
 	for (let plugin of plugins) {
-		pluginsString += `const ${lodash.camelCase(
-			path.parse(plugin).name,
-		)} = require("${plugin}");\n`;
+		const pluginName = lodash.camelCase(path.parse(plugin).name);
+		pluginString += `const ${pluginName} = require("${plugin}");\n`;
 	}
-	if (imports.length > 0) {
-		for (let imp of imports) {
-			pluginsString += imp;
-		}
-	}
-	return pluginsString;
+	pluginString += imports.join('\n').concat('\n');
+	return pluginString;
 }
 
-export function addMarkdownConfiguration(plugins) {
+function addMarkdownConfiguration(plugins) {
 	const pluginOptions = JSON.parse(
 		fs.readFileSync(path.join(__dirname, '..', '/lib/plugins/markdown.json'), 'utf8'),
 	);
-	let configuration = `const mdLib = markdownIt({
-        html: true,
-        breaks: true,
-        linkify: true,
-    })\n`;
-	for (let plugin of plugins) {
+
+	const pluginConfigs = plugins.map((plugin) => {
 		const pluginName = lodash.camelCase(path.parse(plugin).name);
-		configuration += `.use(${pluginName})${
-			pluginOptions[plugin].options !== '' ? `, { ${pluginOptions[plugin].options} }` : ''
-		}`;
-		configuration += plugin === markdownPlugins[markdownPlugins.length - 1] ? ';' : '';
-	}
-	return configuration + `\neleventyConfig.setLibrary("md", mdLib);\n`;
+		const options =
+			pluginOptions[plugin].options !== ''
+				? `, { ${pluginOptions[plugin].options} }`
+				: '';
+		return `.use(${pluginName}${options})`;
+	});
+
+	const configuration = `const mdLib = markdownIt({
+      html: true,
+      breaks: true,
+      linkify: true
+    })
+    ${pluginConfigs.join('\n')}
+    ;\n`;
+
+	return configuration + 'eleventyConfig.setLibrary("md", mdLib);\n';
 }
 
-function createConfigFile(
+function createConfigFile({
+	properties,
 	bundles,
 	filters,
 	shortcodes,
 	collections,
 	markdownPlugins,
-	properties,
 	assets,
-) {
+} = {}) {
 	if (bundles.length > 0) {
 		for (let bundle of bundles) {
 			const debundled = debundle(bundle);
@@ -63,7 +64,7 @@ function createConfigFile(
 			collections.push(...(debundled.collections || []));
 		}
 	}
-	const addons = [...filters, ...shortcodes, ...collections];
+	const addons = [...(filters || []), ...(shortcodes || []), ...(collections || [])];
 	let imports = [];
 	let setup = [];
 	for (let addon of addons) {
@@ -71,34 +72,35 @@ function createConfigFile(
 		imports.push(...(output.imports || []));
 		setup.push(output.func);
 	}
-	if (assets.parent !== '') {
-		assets.parent += '/';
-	} else {
-		assets.parent = '';
+
+	let passthroughCopy = [];
+	for (let asset of Object.values(assets).filter((asset) => asset !== 'assets')) {
+		passthroughCopy.push(
+			`eleventyConfig.addPassthroughCopy("${path.join(
+				properties.input,
+				assets.parent,
+				asset,
+			)}");`,
+		);
 	}
+
 	return `${addImports(markdownPlugins, imports)}
 module.exports = function (eleventyConfig) {
     ${addMarkdownConfiguration(markdownPlugins)}
 
-    ${setup.length > 0 ? setup.join('\n') : ''}
+    ${setup.join('\n')}
 
-    eleventyConfig.addPassthroughCopy("${properties.input}/${assets.parent}${
-		assets.css
-	}");
-    eleventyConfig.addPassthroughCopy("${properties.input}/${assets.parent}${assets.js}");
-    eleventyConfig.addPassthroughCopy("${properties.input}/${assets.parent}${
-		assets.img
-	}");
+    ${passthroughCopy.join('\n')}
 
     return {
-        dir: {
-            input: "${properties.input}",
-            includes: "${properties.includes}",
-            data: "${properties.data}",
-            output: "${properties.output}",
-        },
+      dir: {
+        input: "${properties.input}",
+        includes: "${properties.includes}",
+        data: "${properties.data}",
+        output: "${properties.output}",
+      },
     };
-};`;
+  };`;
 }
 
 export function generateProject(answers, options) {
@@ -109,7 +111,6 @@ export function generateProject(answers, options) {
 		shortcodes,
 		collections,
 		markdownPlugins,
-		pages,
 		properties,
 		assets,
 	} = answers;
@@ -118,60 +119,46 @@ export function generateProject(answers, options) {
 	if (options.silent) {
 		console.log = () => {};
 	}
+	const dirs = {
+		input: path.join(project, properties.input),
+		includes: path.join(project, properties.input, properties.includes),
+		data: path.join(project, properties.input, properties.data),
+		output: path.join(project, properties.output),
+		css: path.join(project, properties.input, assets.parent, assets.css),
+		js: path.join(project, properties.input, assets.parent, assets.js),
+		img: path.join(project, properties.input, assets.parent, assets.img),
+	};
 
-	const projectDirectory = lodash.kebabCase(project);
-	const inputDirectory = path.join(projectDirectory, properties.input);
-	console.log(
-		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(projectDirectory))}.`,
-	);
-	if (!fs.existsSync(projectDirectory)) {
-		fs.mkdirSync(projectDirectory);
+	console.log(`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}`);
+	if (!fs.existsSync(project)) {
+		fs.mkdirSync(project);
 	}
-	fs.mkdirSync(inputDirectory);
+	fs.mkdirSync(dirs.input);
 	if (options.verbose) {
 		console.log(`\nCreating some directories...`);
-		console.log(`- ${chalk.dim(projectDirectory)}`);
-		console.log(`- ${chalk.dim(inputDirectory)}`);
+		console.log(`- ${chalk.dim(dirs.input)}`);
 	}
-	const dirs = [properties.data, properties.includes];
-	dirs.forEach((dir) => {
-		fs.mkdirSync(path.join(inputDirectory, dir));
-		if (options.verbose) {
-			console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
-		}
-	});
-	const assetDirs = [assets.css, assets.js, assets.img];
-	if (assets.parent !== '') fs.mkdirSync(path.join(inputDirectory, assets.parent));
-	assetDirs.forEach((dir) => {
-		if (assets.parent !== '') {
-			fs.mkdirSync(path.join(inputDirectory, assets.parent, dir));
+	[...Object.values(dirs)]
+		.filter((dir) => dir !== dirs.input)
+		.forEach((dir) => {
+			fs.mkdirSync(dir, { recursive: true });
 			if (options.verbose) {
-				console.log(
-					`- ${chalk.dim(
-						path.join(projectDirectory, properties.input, assets.parent, dir),
-					)}`,
-				);
+				console.log(`- ${chalk.dim(dir)}`);
 			}
-		} else {
-			fs.mkdirSync(path.join(inputDirectory, dir));
-			if (options.verbose) {
-				console.log(`- ${chalk.dim(path.join(projectDirectory, properties.input, dir))}`);
-			}
-		}
-	});
+		});
 
 	fs.writeFileSync(
-		path.join(projectDirectory, properties.configFile),
+		path.join(project, properties.configFile),
 		prettier.format(
-			createConfigFile(
+			createConfigFile({
+				properties,
 				bundles,
 				filters,
 				shortcodes,
 				collections,
 				markdownPlugins,
-				properties,
 				assets,
-			),
+			}),
 			{
 				tabWidth: 2,
 				printWidth: 80,
@@ -185,37 +172,26 @@ export function generateProject(answers, options) {
 		},
 	);
 	if (options.verbose)
-		console.log(`- ${chalk.dim(path.join(projectDirectory, properties.configFile))}`);
+		console.log(`- ${chalk.dim(path.join(project, properties.configFile))}`);
 
 	if (options.verbose) console.log(`\nCopying files...`);
-	const filesToCopy = {
-		gitignore: '.gitignore',
-		'logo.png': path.join(properties.input, assets.parent, assets.img, 'logo.png'),
-		'style.css': path.join(properties.input, assets.parent, assets.css, 'style.css'),
-	};
-	if (pages) {
-		pages.forEach((page) => {
-			page = lodash.kebabCase(page);
-			filesToCopy[`${path.join('/pages', page)}.md`] = path.join(
-				properties.input,
-				`${page}.md`,
-			);
-		});
-	}
-	for (let source in filesToCopy) {
+	for (let [source, destination] of Object.entries({
+		gitignore: path.join(project, '.gitignore'),
+		'logo.png': path.join(dirs.img, 'logo.png'),
+		'style.css': path.join(dirs.css, 'style.css'),
+	})) {
 		fs.copyFileSync(
 			path.join(__dirname, '..', '/lib/files', source),
-			path.join(projectDirectory, filesToCopy[source]),
+			path.join(destination),
 		);
-		if (options.verbose)
-			console.log(`- ${chalk.dim(path.join(projectDirectory, filesToCopy[source]))}`);
+		if (options.verbose) console.log(`- ${chalk.dim(path.join(destination))}`);
 	}
 	const templates = {
-		'README.md.hbs': 'README.md',
-		'index.md.hbs': path.join(properties.input, 'index.md'),
-		'base.njk.hbs': path.join(properties.input, properties.includes, 'base.njk'),
-		'package.json.hbs': 'package.json',
-		'site.json.hbs': path.join(properties.input, properties.data, 'site.json'),
+		'README.md.hbs': path.join(project, 'README.md'),
+		'index.md.hbs': path.join(dirs.input, 'index.md'),
+		'base.njk.hbs': path.join(dirs.includes, 'base.njk'),
+		'package.json.hbs': path.join(project, 'package.json'),
+		'site.json.hbs': path.join(dirs.data, 'site.json'),
 	};
 	const compiledTemplates = Object.entries(templates).reduce(
 		(acc, [templateFile, outputFile]) => {
@@ -230,7 +206,6 @@ export function generateProject(answers, options) {
 	);
 	const handlebarsData = {
 		project,
-		domain: lodash.kebabCase(project),
 		input: properties.input,
 		output: properties.output,
 		assets: {
@@ -243,26 +218,12 @@ export function generateProject(answers, options) {
 		data: properties.data,
 	};
 	Object.entries(compiledTemplates).forEach(([outputFile, compiledTemplate]) => {
-		fs.writeFileSync(
-			path.join(projectDirectory, outputFile),
-			compiledTemplate(handlebarsData),
-		);
+		fs.writeFileSync(path.join(outputFile), compiledTemplate(handlebarsData));
+		if (options.verbose) console.log(`- ${chalk.dim(path.join(outputFile))}`);
 	});
-	if (options.verbose) {
-		console.log(`- ${chalk.dim(path.join(projectDirectory, 'README.md'))}`);
-		console.log(
-			`- ${chalk.dim(path.join(projectDirectory, properties.input, 'index.md'))}`,
-		);
-		console.log(
-			`- ${chalk.dim(
-				path.join(projectDirectory, properties.input, properties.includes, 'base.njk'),
-			)}`,
-		);
-		console.log(`- ${chalk.dim(path.join(projectDirectory, 'package.json'))}`);
-	}
 
 	if (options.install) {
-		const allDependencies = [
+		const dependencies = [
 			...markdownPlugins,
 			'markdown-it',
 			'@11ty/eleventy@' + options.set,
@@ -272,12 +233,12 @@ export function generateProject(answers, options) {
 			complete: '▓',
 			incomplete: '░',
 			width: 30,
-			total: allDependencies.length,
+			total: dependencies.length,
 		});
 		console.log(`\nInstalling dependencies...\n`);
 		console.log = restoreLog;
-		for (let dependency of allDependencies) {
-			child_process.execSync(`cd ${projectDirectory} && npm install ${dependency}`);
+		for (let dependency of dependencies) {
+			child_process.execSync(`cd ${project} && npm install ${dependency}`);
 			bar.tick();
 		}
 	} else {
@@ -290,7 +251,7 @@ export function generateProject(answers, options) {
 	console.log(
 		`\n${chalk.cyan.bold('Next steps:')} \n\n- ${chalk.bold(
 			'cd',
-			projectDirectory,
+			project,
 		)} \n- ${chalk.bold('npm start')} \n- ${chalk.underline(
 			'https://www.11ty.dev/docs/',
 		)}`,

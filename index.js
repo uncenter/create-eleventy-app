@@ -2,6 +2,7 @@
 
 import inquirer from 'inquirer';
 import path from 'path';
+import lodash from 'lodash';
 import updateNotifier from 'update-notifier';
 import packageJson from './package.json' assert { type: 'json' };
 
@@ -105,10 +106,9 @@ async function run() {
 	}
 
 	const answers = {
-		project: project.name,
+		project: lodash.kebabCase(project.name),
 		bundles: bundles.selected,
 		...customizations,
-		pages: customizations.pages,
 		properties: properties,
 		assets: assets,
 	};

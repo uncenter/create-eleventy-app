@@ -88,7 +88,7 @@ export function addAddon(addonName) {
 			findFile(addonName + '.js', path.join(__dirname, '..', './lib/addons'), 'utf8'),
 		)
 		.toString();
-	const imports = addon.match(/const .* = require\(".*"\);/g);
+	const imports = addon.match(/const\s+.*\s*=\s*require\(['"].*['"]\);/g);
 	if (imports) {
 		for (let imp of imports) {
 			addon = addon.replace(imp, '');
