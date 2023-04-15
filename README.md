@@ -13,16 +13,10 @@
 
 ---
 
-## Installation
-
-```sh
-npm install -g create-eleventy-app
-```
-
 ## Usage
 
 ```sh
-npx create-eleventy-app 
+npx create-eleventy-app@latest
 ```
 
 ### Options
@@ -31,18 +25,18 @@ npx create-eleventy-app
 
 Show help.
 
-#### `--silent`
+#### `--silent`, `-s`
 
 Silence the output of the CLI.
 
-#### `--verbose`
+#### `--verbose`, `-v`
 
 Show verbose output of the CLI.
 
-#### `--no-install`
+#### `--no-install`, `-n`
 
 Skip the installation of dependencies.
 
-#### `--set <version>`
+#### `--set <version>`, `-e <version>`
 
 Set the version of Eleventy to install.
