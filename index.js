@@ -13,7 +13,7 @@ import { Command } from 'commander';
 import { generateOptions } from './src/utils.js';
 
 import * as url from 'url';
-const __version = '1.0.0';
+const __version = packageJson.version;
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const notifier = updateNotifier({
@@ -46,7 +46,7 @@ if (options.verbose && options.silent) {
 	console.error('You cannot use both --verbose and --silent.');
 	process.exit(1);
 }
-if (options.set !== 'latest' || options.set !== 'next') {
+if (options.set !== 'latest' && options.set !== 'next') {
 	const data = await queryPackage('@11ty/eleventy');
 	if (!data.versions.includes(options.set)) {
 		console.error(
