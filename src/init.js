@@ -193,16 +193,14 @@ export function generateProject(answers, options) {
 		'package.json.hbs': path.join(project, 'package.json'),
 		'site.json.hbs': path.join(dirs.data, 'site.json'),
 	};
-	const compiledTemplates = Object.entries(templates).reduce(
-		(acc, [templateFile, outputFile]) => {
+	const compiledTemplates = Object.fromEntries(
+		Object.entries(templates).map(([templateFile, outputFile]) => {
 			const templateSource = fs.readFileSync(
 				path.join(__dirname, '..', 'lib', 'files', templateFile),
 				'utf8',
 			);
-			acc[outputFile] = Handlebars.compile(templateSource);
-			return acc;
-		},
-		{},
+			return [outputFile, Handlebars.compile(templateSource)];
+		}),
 	);
 	const handlebarsData = {
 		project,
