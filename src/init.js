@@ -187,19 +187,17 @@ export function generateProject(answers, options) {
 		bar.tick();
 	}
 
-	console.log(`\n${chalk.green.bold('✓ Success!')} Project generation complete.`);
-	console.log(
-		`\n${chalk.cyan.bold('Next steps:')} \n\n- ${chalk.bold(
-			'cd',
-			project,
-		)} \n- ${chalk.bold('npm start')} \n- ${chalk.underline(
-			'https://www.11ty.dev/docs/',
-		)}`,
-	);
-	console.log(
-		`\n${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(
-			'Ctrl + C',
-		)}.`,
-	);
+	console.log(`
+${chalk.green.bold('✓ Success!')} Project generation complete.
+
+${chalk.cyan.bold('Next steps:')}
+
+- ${chalk.bold('cd', project)}
+- ${chalk.bold(packageManagerCommands[options.install] + ' start')}
+- ${chalk.underline('https://www.11ty.dev/docs/')}
+
+${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(
+		'Ctrl + C',
+	)} in your terminal.`);
 	process.exit(0);
 }
