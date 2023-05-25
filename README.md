@@ -20,10 +20,6 @@ npx create-eleventy-app@latest
 
 ### Options
 
-#### `--help`
-
-Show help information; command line options and usage.
-
 #### `--silent`, `-s`
 
 Silence the output of the CLI.
@@ -32,10 +28,14 @@ Silence the output of the CLI.
 
 Show verbose output of the CLI.
 
-#### `--install`, `-n`
+#### `--install <package-manager>`, `-i <package-manager>`
 
-Install dependencies after creating the project.
+Specify the package manager to use for installing dependencies. Defaults to `npm`, but can be set to `yarn`, `pnpm`, or `npm`.
 
 #### `--set <version>`, `-e <version>`
 
 Set the version of Eleventy to install.
+
+#### `--help`
+
+Show help information; command line options and usage.
