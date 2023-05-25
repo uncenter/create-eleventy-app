@@ -12,7 +12,7 @@ import { Command, Option } from 'commander';
 
 const __version = packageJson.version;
 
-const notifier = updateNotifier({
+updateNotifier({
 	pkg: packageJson,
 	updateCheckInterval: 1000 * 60 * 60 * 12,
 	isGlobal: true,
@@ -23,9 +23,7 @@ const notifier = updateNotifier({
 		borderColor: 'cyan',
 		borderStyle: 'bold',
 	},
-});
-
-notifier.notify();
+}).notify();
 
 const program = new Command();
 program
@@ -62,7 +60,7 @@ async function run() {
 	const project = await inquirer.prompt(prompts.project);
 
 	let customizations = {
-		filters: [],
+		filters: ['htmlDateString', 'readableDate'],
 		shortcodes: [],
 		collections: [],
 	};
