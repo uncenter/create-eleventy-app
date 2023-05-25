@@ -166,24 +166,25 @@ export function generateProject(answers, options) {
 		if (options.verbose) console.log(`- ${chalk.dim(path.join(outputFile))}`);
 	});
 
-	if (options.install) {
-		const dependencies = ['markdown-it', '@11ty/eleventy@' + options.set, 'rimraf'];
-		var bar = new ProgressBar(':bar :percent', {
-			complete: '▓',
-			incomplete: '░',
-			width: 30,
-			total: dependencies.length,
-		});
-		console.log(`\nInstalling dependencies...\n`);
-		console.log = restoreLog;
-		for (let dependency of dependencies) {
-			child_process.execSync(`cd ${project} && npm install ${dependency}`);
-			bar.tick();
-		}
-	} else {
-		console.log(
-			`\nDependencies not installed (expected, since --no-install was passed).`,
+	const dependencies = ['markdown-it', '@11ty/eleventy@' + options.set, 'rimraf'];
+	var bar = new ProgressBar(':bar :percent', {
+		complete: '▓',
+		incomplete: '░',
+		width: 30,
+		total: dependencies.length,
+	});
+	console.log(`\nInstalling dependencies...\n`);
+	console.log = restoreLog;
+	let packageManagerCommands = {
+		npm: 'npm install',
+		yarn: 'yarn add',
+		pnpm: 'pnpm add',
+	};
+	for (let dependency of dependencies) {
+		child_process.execSync(
+			`cd ${project} && ${packageManagerCommands[options.install]} ${dependency}`,
 		);
+		bar.tick();
 	}
 
 	console.log(`\n${chalk.green.bold('✓ Success!')} Project generation complete.`);
@@ -196,7 +197,9 @@ export function generateProject(answers, options) {
 		)}`,
 	);
 	console.log(
-		`\n${chalk.yellow('Note:')} To close the server, press ${chalk.bold('Ctrl + C')}.`,
+		`\n${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(
+			'Ctrl + C',
+		)}.`,
 	);
 	process.exit(0);
 }

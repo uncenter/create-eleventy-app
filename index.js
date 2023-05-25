@@ -8,7 +8,7 @@ import packageJson from './package.json' assert { type: 'json' };
 import { generateProject } from './src/init.js';
 import { prompts } from './src/prompts.js';
 import { queryPackage } from './src/utils.js';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 
 const __version = packageJson.version;
 
@@ -33,11 +33,17 @@ program
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')
-	.option('-n, --no-install', 'do not install dependencies');
+	.addOption(
+		new Option(
+			'-i, --install <package-manager>',
+			'install dependencies using specified package manager',
+		)
+			.choices(['npm', 'yarn', 'pnpm'])
+			.default('npm'),
+	);
 
 program.parse(process.argv);
-const options = program.opts();
-
+let options = program.opts();
 if (options.verbose && options.silent) {
 	console.error('You cannot use both --verbose and --silent.');
 	process.exit(1);
@@ -75,6 +81,7 @@ async function run() {
 		js: 'js',
 		img: 'img',
 	};
+
 	const configureAdvanced = await inquirer.prompt(prompts.configureAdvanced);
 	if (configureAdvanced.answer) {
 		properties = await inquirer.prompt(prompts.properties);
