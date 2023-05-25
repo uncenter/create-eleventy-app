@@ -19,11 +19,9 @@
 	"dependencies": {
 		"chalk": "^5.2.0",
 		"commander": "^10.0.0",
-		"fs": "^0.0.1-security",
 		"handlebars": "^4.7.7",
 		"inquirer": "^9.1.4",
 		"lodash": "^4.17.21",
-		"path": "^0.12.7",
 		"progress": "^2.0.3",
 		"update-notifier": "^6.0.2",
 		"prettier": "^2.8.7"
