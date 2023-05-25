@@ -175,14 +175,15 @@ export function generateProject(answers, options) {
 	});
 	console.log(`\nInstalling dependencies...\n`);
 	console.log = restoreLog;
-	let packageManagerCommands = {
-		npm: 'npm install',
-		yarn: 'yarn add',
-		pnpm: 'pnpm add',
-	};
 	for (let dependency of dependencies) {
 		child_process.execSync(
-			`cd ${project} && ${packageManagerCommands[options.install]} ${dependency}`,
+			`cd ${project} && ${
+				{
+					npm: 'npm install',
+					yarn: 'yarn add',
+					pnpm: 'pnpm add',
+				}[options.install]
+			} ${dependency}`,
 		);
 		bar.tick();
 	}
@@ -193,7 +194,7 @@ ${chalk.green.bold('✓ Success!')} Project generation complete.
 ${chalk.cyan.bold('Next steps:')}
 
 - ${chalk.bold('cd', project)}
-- ${chalk.bold(packageManagerCommands[options.install] + ' start')}
+- ${chalk.bold(options.install + ' start')}
 - ${chalk.underline('https://www.11ty.dev/docs/')}
 
 ${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(
