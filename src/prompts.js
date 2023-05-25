@@ -1,9 +1,4 @@
-import { dirExists, generateOptions } from './utils.js';
-
-import path from 'path';
-
-import * as url from 'url';
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+import { dirExists } from './utils.js';
 
 const project = () => ({
 	type: 'input',
@@ -20,43 +15,6 @@ const project = () => ({
 		return true;
 	},
 });
-
-const quickstart = () => ({
-	type: 'confirm',
-	name: 'answer',
-	message: 'Use quickstart?',
-	default: true,
-});
-
-const customizations = () => [
-	{
-		type: 'checkbox',
-		name: 'filters',
-		message: 'What filters would you like to use?',
-		choices: generateOptions(path.join(__dirname, '..', '/lib/addons/filters/')),
-		loop: false,
-	},
-	// {
-	// 	type: 'checkbox',
-	// 	name: 'shortcodes',
-	// 	message: 'What shortcodes would you like to use?',
-	// 	choices: generateOptions(path.join(__dirname, '..', '/lib/addons/shortcodes/')),
-	// 	loop: false,
-	// },
-	// {
-	// 	type: 'checkbox',
-	// 	name: 'collections',
-	// 	message: 'What collections would you like to use?',
-	// 	choices: generateOptions(path.join(__dirname, '..', '/lib/addons/collections/')),
-	// 	loop: false,
-	// },
-	{
-		type: 'checkbox',
-		name: 'markdownPlugins',
-		message: 'What Markdown plugins would you like to use?',
-		choices: generateOptions(path.join(__dirname, '..', '/lib/plugins/markdown.json')),
-	},
-];
 
 const configureAdvanced = () => ({
 	type: 'confirm',
@@ -135,8 +93,6 @@ const assets = () => [
 
 export const prompts = {
 	project: project(),
-	quickstart: quickstart(),
-	customizations: customizations(),
 	configureAdvanced: configureAdvanced(),
 	properties: properties(),
 	configureAssets: configureAssets(),

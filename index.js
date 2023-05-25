@@ -1,7 +1,6 @@
 #!/usr/bin/env node --no-warnings
 
 import inquirer from 'inquirer';
-import path from 'path';
 import lodash from 'lodash';
 import updateNotifier from 'update-notifier';
 import packageJson from './package.json' assert { type: 'json' };
@@ -10,11 +9,8 @@ import { generateProject } from './src/init.js';
 import { prompts } from './src/prompts.js';
 import { queryPackage } from './src/utils.js';
 import { Command } from 'commander';
-import { generateOptions } from './src/utils.js';
 
-import * as url from 'url';
 const __version = packageJson.version;
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const notifier = updateNotifier({
 	pkg: packageJson,
@@ -58,16 +54,13 @@ if (options.set !== 'latest' && options.set !== 'next') {
 
 async function run() {
 	const project = await inquirer.prompt(prompts.project);
-	const quickstart = await inquirer.prompt(prompts.quickstart);
 
 	let customizations = {
 		filters: [],
 		shortcodes: [],
 		collections: [],
-		markdownPlugins: [],
-		pages: [],
 	};
-	let bundles = { selected: [] };
+
 	let properties = {
 		configFile: 'eleventy.config.js',
 		output: 'dist',
@@ -75,39 +68,24 @@ async function run() {
 		data: '_data',
 		includes: '_includes',
 	};
+
 	let assets = {
 		parent: 'assets',
 		css: 'css',
 		js: 'js',
 		img: 'img',
 	};
-	if (quickstart.answer) {
-		for (let bundle of generateOptions(path.join(__dirname, '/lib/addons/bundles/'))) {
-			const bundlePrompt = await inquirer.prompt({
-				type: 'confirm',
-				name: 'answer',
-				message: `Use the ${bundle.name} bundle?`,
-				default: true,
-			});
-			if (bundlePrompt.answer) {
-				bundles.selected.push(bundle.name);
-			}
-		}
-	} else {
-		customizations = await inquirer.prompt(prompts.customizations);
-		const configureAdvanced = await inquirer.prompt(prompts.configureAdvanced);
-		if (configureAdvanced.answer) {
-			properties = await inquirer.prompt(prompts.properties);
-			const configureAssets = await inquirer.prompt(prompts.configureAssets);
-			if (configureAssets.answer) {
-				assets = await inquirer.prompt(prompts.assets);
-			}
+	const configureAdvanced = await inquirer.prompt(prompts.configureAdvanced);
+	if (configureAdvanced.answer) {
+		properties = await inquirer.prompt(prompts.properties);
+		const configureAssets = await inquirer.prompt(prompts.configureAssets);
+		if (configureAssets.answer) {
+			assets = await inquirer.prompt(prompts.assets);
 		}
 	}
 
 	const answers = {
 		project: lodash.kebabCase(project.name),
-		bundles: bundles.selected,
 		...customizations,
 		properties: properties,
 		assets: assets,

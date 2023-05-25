@@ -1,4 +1,4 @@
-import { debundle, addAddon } from './utils.js';
+import { addAddon } from './utils.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -7,63 +7,11 @@ import child_process from 'child_process';
 import prettier from 'prettier';
 import ProgressBar from 'progress';
 import Handlebars from 'handlebars';
-import lodash from 'lodash';
 
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-function addImports(plugins, imports) {
-	let pluginString = "const markdownIt = require('markdown-it');";
-	for (let plugin of plugins) {
-		const pluginName = lodash.camelCase(path.parse(plugin).name);
-		pluginString += `const ${pluginName} = require("${plugin}");\n`;
-	}
-	pluginString += imports.join('\n').concat('\n');
-	return pluginString;
-}
-
-function addMarkdownConfiguration(plugins) {
-	const pluginOptions = JSON.parse(
-		fs.readFileSync(path.join(__dirname, '..', '/lib/plugins/markdown.json'), 'utf8'),
-	);
-
-	const pluginConfigs = plugins.map((plugin) => {
-		const pluginName = lodash.camelCase(path.parse(plugin).name);
-		const options =
-			pluginOptions[plugin].options !== ''
-				? `, { ${pluginOptions[plugin].options} }`
-				: '';
-		return `.use(${pluginName}${options})`;
-	});
-
-	const configuration = `const mdLib = markdownIt({
-      html: true,
-      breaks: true,
-      linkify: true
-    })
-    ${pluginConfigs.join('\n')}
-    ;\n`;
-
-	return configuration + 'eleventyConfig.setLibrary("md", mdLib);\n';
-}
-
-function createConfigFile({
-	properties,
-	bundles,
-	filters,
-	shortcodes,
-	collections,
-	markdownPlugins,
-	assets,
-} = {}) {
-	if (bundles.length > 0) {
-		for (let bundle of bundles) {
-			const debundled = debundle(bundle);
-			filters.push(...(debundled.filters || []));
-			shortcodes.push(...(debundled.shortcodes || []));
-			collections.push(...(debundled.collections || []));
-		}
-	}
+function createConfigFile({ properties, filters, shortcodes, collections, assets } = {}) {
 	const addons = [...(filters || []), ...(shortcodes || []), ...(collections || [])];
 	let imports = [];
 	let setup = [];
@@ -76,17 +24,23 @@ function createConfigFile({
 	let passthroughCopy = [];
 	for (let asset of Object.values(assets).filter((asset) => asset !== 'assets')) {
 		passthroughCopy.push(
-			`eleventyConfig.addPassthroughCopy("${path.join(
-				properties.input,
-				assets.parent,
-				asset,
-			)}");`,
+			`eleventyConfig.addPassthroughCopy(${JSON.stringify(
+				path.join(properties.input, assets.parent, asset),
+			)});`,
 		);
 	}
 
-	return `${addImports(markdownPlugins, imports)}
+	return `
+const markdownIt = require('markdown-it');
+${imports.join('\n').concat('\n')}
+
 module.exports = function (eleventyConfig) {
-    ${addMarkdownConfiguration(markdownPlugins)}
+    const mdLib = markdownIt({
+        html: true,
+        breaks: true,
+        linkify: true
+    });
+    eleventyConfig.setLibrary("md", mdLib);
 
     ${setup.join('\n')}
 
@@ -104,16 +58,7 @@ module.exports = function (eleventyConfig) {
 }
 
 export function generateProject(answers, options) {
-	const {
-		project,
-		bundles,
-		filters,
-		shortcodes,
-		collections,
-		markdownPlugins,
-		properties,
-		assets,
-	} = answers;
+	const { project, filters, shortcodes, collections, properties, assets } = answers;
 
 	const restoreLog = console.log;
 	if (options.silent) {
@@ -129,7 +74,9 @@ export function generateProject(answers, options) {
 		img: path.join(project, properties.input, assets.parent, assets.img),
 	};
 
-	console.log(`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}`);
+	console.log(
+		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}...`,
+	);
 	if (!fs.existsSync(project)) {
 		fs.mkdirSync(project);
 	}
@@ -138,7 +85,7 @@ export function generateProject(answers, options) {
 		console.log(`\nCreating some directories...`);
 		console.log(`- ${chalk.dim(dirs.input)}`);
 	}
-	[...Object.values(dirs)]
+	[...Object.values(dirs).filter((dir) => dir !== dirs.output)]
 		.filter((dir) => dir !== dirs.input)
 		.forEach((dir) => {
 			fs.mkdirSync(dir, { recursive: true });
@@ -152,11 +99,9 @@ export function generateProject(answers, options) {
 		prettier.format(
 			createConfigFile({
 				properties,
-				bundles,
 				filters,
 				shortcodes,
 				collections,
-				markdownPlugins,
 				assets,
 			}),
 			{
@@ -221,12 +166,7 @@ export function generateProject(answers, options) {
 	});
 
 	if (options.install) {
-		const dependencies = [
-			...markdownPlugins,
-			'markdown-it',
-			'@11ty/eleventy@' + options.set,
-			'rimraf',
-		];
+		const dependencies = ['markdown-it', '@11ty/eleventy@' + options.set, 'rimraf'];
 		var bar = new ProgressBar(':bar :percent', {
 			complete: '▓',
 			incomplete: '░',
