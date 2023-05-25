@@ -99,13 +99,9 @@ export function addAddon(addonName) {
 }
 
 export async function queryPackage(packageName, version = null) {
-	let endpoint;
-	if (version) {
-		endpoint = `https://registry.npmjs.org/${packageName}/${version}`;
-	} else {
-		endpoint = `https://registry.npmjs.org/${packageName}`;
-	}
-	const res = await fetch(endpoint);
+	const res = await fetch(
+		`https://registry.npmjs.org/${packageName}${version ? '/' + version : ''}`,
+	);
 	const data = await res.json();
 	function getLatestVersion() {
 		const versions = Object.keys(data.versions);
