@@ -5,6 +5,7 @@ import path from 'path';
 import chalk from 'chalk';
 import child_process from 'child_process';
 import prettier from 'prettier';
+
 import ProgressBar from 'progress';
 import Handlebars from 'handlebars';
 
