@@ -23,7 +23,7 @@ function createConfigFile({ properties, filters, shortcodes, collections, assets
 	}
 
 	let passthroughCopy = [];
-	for (let asset of Object.values(assets).filter((asset) => asset !== 'assets')) {
+	for (let asset of Object.values(assets).filter((asset) => assets.parent !== asset)) {
 		passthroughCopy.push(
 			`eleventyConfig.addPassthroughCopy(${JSON.stringify(
 				path.join(properties.input, assets.parent, asset),
