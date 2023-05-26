@@ -172,7 +172,9 @@ export function generateProject(answers, options) {
 		total: dependencies.length,
 	});
 	console.log(
-		`\nInstalling dependencies:\n - ${chalk.cyan(dependencies.join('\n - '))}\n`,
+		`\nInstalling dependencies (using ${chalk.cyan(options.install)}):\n - ${chalk.cyan(
+			dependencies.join('\n - '),
+		)}\n`,
 	);
 	console.log = restoreLog;
 	for (let dependency of dependencies) {
@@ -188,11 +190,9 @@ export function generateProject(answers, options) {
 		bar.tick();
 	}
 	console.log(`
-${chalk.green.bold('✓ Success!')} Created ${chalk.bold(project)} at ${path.resolve(
-		project,
-	)}
+${chalk.green('✓ Success!')} Created ${chalk.bold(project)} at ${path.resolve(project)}
 
-${chalk.cyan.bold('Next steps:')}
+${chalk.blue('Next steps:')}
 
 - ${chalk.bold('cd', project)}
 - ${chalk.bold(options.install + ' start')}
