@@ -1,7 +1,7 @@
 {
 	"name": "create-eleventy-app",
 	"author": "uncenter",
-	"version": "1.5.2",
+	"version": "1.6.0",
 	"description": "An easy-to-use CLI tool to quickly create a fresh Eleventy project.",
 	"license": "MIT",
 	"scripts": {
