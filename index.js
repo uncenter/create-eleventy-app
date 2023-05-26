@@ -6,8 +6,7 @@ import updateNotifier from 'update-notifier';
 import packageJson from './package.json' assert { type: 'json' };
 
 import { generateProject } from './src/init.js';
-import { prompts } from './src/prompts.js';
-import { queryPackage } from './src/utils.js';
+import { queryPackage, dirExists } from './src/utils.js';
 import { Command, Option } from 'commander';
 
 const __version = packageJson.version;
@@ -57,7 +56,21 @@ if (options.set !== 'latest' && options.set !== 'next') {
 }
 
 async function run() {
-	const project = await inquirer.prompt(prompts.project);
+	const project = await inquirer.prompt({
+		type: 'input',
+		name: 'name',
+		message: 'What is your project named?',
+		default: 'my-project',
+		validate: (input) => {
+			if (dirExists(input)) {
+				return 'A directory with that name already exists.';
+			}
+			if (input.trim() === '') {
+				return 'Please enter a project name.';
+			}
+			return true;
+		},
+	});
 
 	let customizations = {
 		filters: ['htmlDateString', 'readableDate'],
@@ -80,12 +93,79 @@ async function run() {
 		img: 'img',
 	};
 
-	const configureAdvanced = await inquirer.prompt(prompts.configureAdvanced);
+	const configureAdvanced = await inquirer.prompt({
+		type: 'confirm',
+		name: 'answer',
+		message: 'Configure advanced properties?',
+		default: false,
+	});
 	if (configureAdvanced.answer) {
-		properties = await inquirer.prompt(prompts.properties);
-		const configureAssets = await inquirer.prompt(prompts.configureAssets);
+		properties = await inquirer.prompt([
+			{
+				type: 'list',
+				name: 'configFile',
+				message: 'Set Eleventy config file path?',
+				choices: ['eleventy.config.js', 'eleventy.config.cjs', '.eleventy.js'],
+				default: 'eleventy.config.js',
+			},
+			{
+				type: 'input',
+				name: 'output',
+				message: 'Set output directory?',
+				default: 'dist',
+			},
+			{
+				type: 'input',
+				name: 'input',
+				message: 'Set input directory?',
+				default: 'src',
+			},
+			{
+				type: 'input',
+				name: 'data',
+				message: 'Set data directory?',
+				default: '_data',
+			},
+			{
+				type: 'input',
+				name: 'includes',
+				message: 'Set includes directory?',
+				default: '_includes',
+			},
+		]);
+		const configureAssets = await inquirer.prompt({
+			type: 'confirm',
+			name: 'answer',
+			message: 'Configure assets directory?',
+			default: false,
+		});
 		if (configureAssets.answer) {
-			assets = await inquirer.prompt(prompts.assets);
+			assets = await inquirer.prompt([
+				{
+					type: 'input',
+					name: 'parent',
+					message: 'Set parent assets directory?',
+					default: 'assets',
+				},
+				{
+					type: 'input',
+					name: 'img',
+					message: 'Set images directory?',
+					default: 'img',
+				},
+				{
+					type: 'input',
+					name: 'js',
+					message: 'Set scripts directory?',
+					default: 'js',
+				},
+				{
+					type: 'input',
+					name: 'css',
+					message: 'Set styles directory?',
+					default: 'css',
+				},
+			]);
 		}
 	}
 
