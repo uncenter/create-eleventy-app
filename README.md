@@ -4,12 +4,9 @@
     <img alt="NPM" src="https://img.shields.io/npm/l/create-eleventy-app?style=for-the-badge&color=">
     <h3></h3>
     <p align="center">
-    An unopinionated (and unofficial) CLI for creating Eleventy projects.
+    An unopinionated (and unofficial) CLI for creating Eleventy project boilerplate.
     </p>
     <img src="./demo.png" alt="A screenshot of the homepage created by create-eleventy-app" width="75%" align="center">
-    <h3></h3>
-    <p>The live page after running and starting <code>create-eleventy-app</code>. Originally designed by <a href="https://github.com/bjankord/create-eleventy-site">Brett Jankord's <code>create-eleventy-site</code></a>.
-    </p>
 </div>
 
 ## Usage
@@ -39,3 +36,11 @@ Set the version of Eleventy to install.
 #### `--help`
 
 Show help information; command line options and usage.
+
+## License
+
+[MIT](./LICENSE)
+
+## Credits
+
+- [Brett Jankord's `create-eleventy-site`](https://github.com/bjankord/create-eleventy-site) for the design of the start page.
