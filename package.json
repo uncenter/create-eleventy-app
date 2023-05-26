@@ -22,9 +22,10 @@
 		"handlebars": "^4.7.7",
 		"inquirer": "^9.1.4",
 		"lodash": "^4.17.21",
+		"prettier": "^2.8.7",
 		"progress": "^2.0.3",
-		"update-notifier": "^6.0.2",
-		"prettier": "^2.8.7"
+		"semver": "^7.5.1",
+		"update-notifier": "^6.0.2"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.21.3",

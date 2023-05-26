@@ -4,6 +4,7 @@ import inquirer from 'inquirer';
 import lodash from 'lodash';
 import updateNotifier from 'update-notifier';
 import packageJson from './package.json' assert { type: 'json' };
+import semver from 'semver';
 
 import { generateProject } from './src/init.js';
 import { queryPackage, dirExists } from './src/utils.js';
@@ -79,7 +80,12 @@ async function run() {
 	};
 
 	let properties = {
-		configFile: 'eleventy.config.js',
+		configFile:
+			options.set === 'latest' ||
+			options.set === 'next' ||
+			semver.gte(options.set, '2.0.0')
+				? 'eleventy.config.js'
+				: '.eleventy.js',
 		output: 'dist',
 		input: 'src',
 		data: '_data',
@@ -106,7 +112,14 @@ async function run() {
 				name: 'configFile',
 				message: 'Set Eleventy config file path?',
 				choices: ['eleventy.config.js', 'eleventy.config.cjs', '.eleventy.js'],
-				default: 'eleventy.config.js',
+				default: properties.configFile,
+				when: () => {
+					return (
+						options.set === 'latest' ||
+						options.set === 'next' ||
+						semver.gte(options.set, '2.0.0')
+					);
+				},
 			},
 			{
 				type: 'input',
