@@ -75,9 +75,7 @@ export function generateProject(answers, options) {
 		img: path.join(project, properties.input, assets.parent, assets.img),
 	};
 
-	console.log(
-		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}...`,
-	);
+	console.log(`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}.`);
 	if (!fs.existsSync(project)) {
 		fs.mkdirSync(project);
 	}
@@ -173,7 +171,9 @@ export function generateProject(answers, options) {
 		width: 30,
 		total: dependencies.length,
 	});
-	console.log(`\nInstalling dependencies...\n`);
+	console.log(
+		`\nInstalling dependencies:\n - ${chalk.cyan(dependencies.join('\n - '))}\n`,
+	);
 	console.log = restoreLog;
 	for (let dependency of dependencies) {
 		child_process.execSync(
@@ -187,9 +187,10 @@ export function generateProject(answers, options) {
 		);
 		bar.tick();
 	}
-
 	console.log(`
-${chalk.green.bold('✓ Success!')} Project generation complete.
+${chalk.green.bold('✓ Success!')} Created ${chalk.bold(project)} at ${path.resolve(
+		project,
+	)}
 
 ${chalk.cyan.bold('Next steps:')}
 
