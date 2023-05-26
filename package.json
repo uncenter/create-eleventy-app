@@ -1,8 +1,8 @@
 {
 	"name": "create-eleventy-app",
 	"author": "uncenter",
-	"version": "2.0.0-1",
-	"description": "Create an Eleventy app with a single command",
+	"version": "1.5.2",
+	"description": "An easy-to-use CLI tool to quickly create a fresh Eleventy project.",
 	"license": "MIT",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
