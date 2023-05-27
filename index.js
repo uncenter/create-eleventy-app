@@ -97,15 +97,26 @@ async function run() {
 		img: 'img',
 	};
 
-	const configureAdvanced = await confirm({
-		message: 'Configure advanced properties?',
-		default: false,
-	});
-	if (configureAdvanced) {
+	if (
+		await confirm({
+			message: 'Configure advanced properties?',
+			default: false,
+		})
+	) {
 		properties = {
 			configFile: await select({
 				message: 'Set Eleventy config file path?',
-				choices: ['eleventy.config.js', 'eleventy.config.cjs', '.eleventy.js'],
+				choices: [
+					{
+						value: 'eleventy.config.js',
+					},
+					{
+						value: 'eleventy.config.cjs',
+					},
+					{
+						value: '.eleventy.js',
+					},
+				],
 				default: properties.configFile,
 				when: () => {
 					return (
@@ -120,17 +131,18 @@ async function run() {
 				default: 'dist',
 			}),
 			input: await input({ message: 'Set input directory?', default: 'src' }),
-			_data: await input({ message: 'Set data directory?', default: '_data' }),
-			_includes: await input({
+			data: await input({ message: 'Set data directory?', default: '_data' }),
+			includes: await input({
 				message: 'Set includes directory?',
 				default: '_includes',
 			}),
 		};
-		const configureAssets = await confirm({
-			message: 'Configure assets directory?',
-			default: false,
-		});
-		if (configureAssets) {
+		if (
+			await confirm({
+				message: 'Configure assets directory?',
+				default: false,
+			})
+		) {
 			assets = {
 				parent: await input({
 					message: 'Set parent assets directory?',
