@@ -1,6 +1,6 @@
 #!/usr/bin/env node --no-warnings
 
-import inquirer from 'inquirer';
+import { input, confirm, select } from '@inquirer/prompts';
 import lodash from 'lodash';
 import updateNotifier from 'update-notifier';
 import packageJson from './package.json' assert { type: 'json' };
@@ -57,9 +57,7 @@ if (options.set !== 'latest' && options.set !== 'next') {
 }
 
 async function run() {
-	const project = await inquirer.prompt({
-		type: 'input',
-		name: 'name',
+	const project = await input({
 		message: 'What is your project named?',
 		default: 'my-project',
 		validate: (input) => {
@@ -99,17 +97,13 @@ async function run() {
 		img: 'img',
 	};
 
-	const configureAdvanced = await inquirer.prompt({
-		type: 'confirm',
-		name: 'answer',
+	const configureAdvanced = await confirm({
 		message: 'Configure advanced properties?',
 		default: false,
 	});
-	if (configureAdvanced.answer) {
-		properties = await inquirer.prompt([
-			{
-				type: 'list',
-				name: 'configFile',
+	if (configureAdvanced) {
+		properties = {
+			configFile: await select({
 				message: 'Set Eleventy config file path?',
 				choices: ['eleventy.config.js', 'eleventy.config.cjs', '.eleventy.js'],
 				default: properties.configFile,
@@ -120,70 +114,37 @@ async function run() {
 						semver.gte(options.set, '2.0.0')
 					);
 				},
-			},
-			{
-				type: 'input',
-				name: 'output',
+			}),
+			output: await input({
 				message: 'Set output directory?',
 				default: 'dist',
-			},
-			{
-				type: 'input',
-				name: 'input',
-				message: 'Set input directory?',
-				default: 'src',
-			},
-			{
-				type: 'input',
-				name: 'data',
-				message: 'Set data directory?',
-				default: '_data',
-			},
-			{
-				type: 'input',
-				name: 'includes',
+			}),
+			input: await input({ message: 'Set input directory?', default: 'src' }),
+			_data: await input({ message: 'Set data directory?', default: '_data' }),
+			_includes: await input({
 				message: 'Set includes directory?',
 				default: '_includes',
-			},
-		]);
-		const configureAssets = await inquirer.prompt({
-			type: 'confirm',
-			name: 'answer',
+			}),
+		};
+		const configureAssets = await confirm({
 			message: 'Configure assets directory?',
 			default: false,
 		});
-		if (configureAssets.answer) {
-			assets = await inquirer.prompt([
-				{
-					type: 'input',
-					name: 'parent',
+		if (configureAssets) {
+			assets = {
+				parent: await input({
 					message: 'Set parent assets directory?',
 					default: 'assets',
-				},
-				{
-					type: 'input',
-					name: 'img',
-					message: 'Set images directory?',
-					default: 'img',
-				},
-				{
-					type: 'input',
-					name: 'js',
-					message: 'Set scripts directory?',
-					default: 'js',
-				},
-				{
-					type: 'input',
-					name: 'css',
-					message: 'Set styles directory?',
-					default: 'css',
-				},
-			]);
+				}),
+				img: await input({ message: 'Set images directory?', default: 'img' }),
+				js: await input({ message: 'Set scripts directory?', default: 'js' }),
+				css: await input({ message: 'Set styles directory?', default: 'css' }),
+			};
 		}
 	}
 
 	const answers = {
-		project: lodash.kebabCase(project.name),
+		project: lodash.kebabCase(project),
 		...customizations,
 		properties: properties,
 		assets: assets,
