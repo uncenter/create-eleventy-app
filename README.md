@@ -4,7 +4,7 @@
     <img alt="NPM" src="https://img.shields.io/npm/l/create-eleventy-app?style=for-the-badge&color=">
     <h3></h3>
     <p align="center">
-    An unopinionated (and unofficial) CLI for creating Eleventy project boilerplate.
+    An unopinionated CLI for creating Eleventy project boilerplate in seconds.
     </p>
     <img src="./demo.png" alt="A screenshot of the homepage created by create-eleventy-app" width="75%" align="center">
 </div>
@@ -32,10 +32,6 @@ Specify the package manager to use for installing dependencies. Defaults to `npm
 #### `--set <version>`, `-e <version>`
 
 Set the version of Eleventy to install.
-
-#### `--help`
-
-Show help information; command line options and usage.
 
 ## License
 
