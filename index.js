@@ -1,14 +1,15 @@
 #!/usr/bin/env node --no-warnings
+import packageJson from './package.json' assert { type: 'json' };
 
 import { input, confirm, select } from '@inquirer/prompts';
+import { Command, Option } from 'commander';
+
 import lodash from 'lodash';
 import updateNotifier from 'update-notifier';
-import packageJson from './package.json' assert { type: 'json' };
 import semver from 'semver';
 
 import { generateProject } from './src/init.js';
 import { queryPackage, dirExists } from './src/utils.js';
-import { Command, Option } from 'commander';
 
 const __version = packageJson.version;
 
