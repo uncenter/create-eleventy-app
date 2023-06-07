@@ -17,7 +17,7 @@
 		"create-eleventy-app": "./index.js"
 	},
 	"dependencies": {
-		"@inquirer/prompts": "^2.1.0",
+		"@inquirer/prompts": "^2.1.1",
 		"chalk": "^5.2.0",
 		"commander": "^10.0.1",
 		"handlebars": "^4.7.7",

@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@inquirer/prompts':
-    specifier: ^2.1.0
-    version: 2.1.0
+    specifier: ^2.1.1
+    version: 2.1.1
   chalk:
     specifier: ^5.2.0
     version: 5.2.0
@@ -349,8 +349,8 @@ packages:
       figures: 3.2.0
     dev: false
 
-  /@inquirer/confirm@2.0.1:
-    resolution: {integrity: sha512-0Aj6hsv31c2whBLqTUNwZALfpn94sX85y7Xn12rU4scqyM9fAfBwIMXJQjqcCDk8ifheNVZLeP3wa/xmtW/tDA==}
+  /@inquirer/confirm@2.0.2:
+    resolution: {integrity: sha512-2/Ogb3fkVyCp/V9aowa3Ge/aNiZCwH58BPYLeaMxRGDRtGV70aw50194/WSfceNfliHOFGQF6Db39c7Q85Dpkg==}
     engines: {node: '>=14.18.0'}
     dependencies:
       '@inquirer/core': 2.1.0
@@ -413,12 +413,12 @@ packages:
       chalk: 4.1.2
     dev: false
 
-  /@inquirer/prompts@2.1.0:
-    resolution: {integrity: sha512-YpfNrTjItyB9CYJUdIBp+9hRUu0e5JR//qC55gRrKjpGZP7CwrMvFJiS1LMZNG5vzd61CDxpOvNmkHcmMe6QmA==}
+  /@inquirer/prompts@2.1.1:
+    resolution: {integrity: sha512-DTtdrf3JoXQpfD5vAhW9isUE7lgcOBN5ikkxTqhkXZY41CnrFt7I2DTOmUUUbkh5shrcwq7zzAmVesoW2KM5EA==}
     engines: {node: '>=14.18.0'}
     dependencies:
       '@inquirer/checkbox': 1.3.1
-      '@inquirer/confirm': 2.0.1
+      '@inquirer/confirm': 2.0.2
       '@inquirer/core': 2.1.0
       '@inquirer/editor': 1.2.0
       '@inquirer/expand': 1.1.1
@@ -649,7 +649,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001495
-      electron-to-chromium: 1.4.421
+      electron-to-chromium: 1.4.425
       node-releases: 2.0.12
       update-browserslist-db: 1.0.11(browserslist@4.21.7)
     dev: true
@@ -848,8 +848,8 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: false
 
-  /electron-to-chromium@1.4.421:
-    resolution: {integrity: sha512-wZOyn3s/aQOtLGAwXMZfteQPN68kgls2wDAnYOA8kCjBvKVrW5RwmWVspxJYTqrcN7Y263XJVsC66VCIGzDO3g==}
+  /electron-to-chromium@1.4.425:
+    resolution: {integrity: sha512-wv1NufHxu11zfDbY4fglYQApMswleE9FL/DSeyOyauVXDZ+Kco96JK/tPfBUaDqfRarYp2WH2hJ/5UnVywp9Jg==}
     dev: true
 
   /emoji-regex@8.0.0:
