@@ -1,13 +1,9 @@
-<div align="center">
-    <h1 align="center">create-eleventy-app</h1>
-    <img alt="npm" src="https://img.shields.io/npm/v/create-eleventy-app?style=for-the-badge&color=red">
-    <img alt="NPM" src="https://img.shields.io/npm/l/create-eleventy-app?style=for-the-badge&color=">
-    <h3></h3>
-    <p align="center">
-    An unopinionated CLI for creating Eleventy project boilerplate in seconds.
-    </p>
-    <img src="./demo.png" alt="A screenshot of the homepage created by create-eleventy-app" width="75%" align="center">
-</div>
+<h1>create-eleventy-app</h1>
+
+[![npm version](https://img.shields.io/npm/v/create-eleventy-app?style=flat-square&color=red)](https://www.npmjs.com/package/create-eleventy-app)
+[![license](https://img.shields.io/npm/l/create-eleventy-app?style=flat-square&color=g)](https://www.npmjs.com/package/create-eleventy-app)
+
+<p>An unopinionated CLI for creating Eleventy project boilerplate in seconds.</p>
 
 ## Usage
 
