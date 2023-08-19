@@ -4,7 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import kleur from 'kleur';
 import child_process from 'child_process';
-import prettier from 'prettier';
+import * as prettier from 'prettier';
 
 import ProgressBar from 'progress';
 import Handlebars from 'handlebars';
@@ -124,7 +124,7 @@ export async function generateProject(answers, options) {
 
 	await fs.writeFile(
 		path.join(project, properties.configFile),
-		prettier.format(
+		await prettier.format(
 			await createConfigFile({
 				properties,
 				filters,
