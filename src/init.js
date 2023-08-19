@@ -223,8 +223,8 @@ ${kleur.green('✓ Success!')} Created ${kleur.bold(project)}.
 
 ${kleur.blue('Next steps:')}
 
-- ${kleur.bold('cd', project)}
-- ${kleur.bold(options.runCmd, 'start')}
+- ${kleur.bold('cd ' + project)}
+- ${kleur.bold(options.runCmd + ' start')}
 - ${kleur.underline('https://www.11ty.dev/docs/')}
 
 ${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(
