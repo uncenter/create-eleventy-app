@@ -2,7 +2,7 @@ import { addAddon } from './utils.js';
 
 import fs from 'fs/promises';
 import path from 'path';
-import chalk from 'chalk';
+import kleur from 'kleur';
 import child_process from 'child_process';
 import prettier from 'prettier';
 
@@ -98,7 +98,7 @@ export async function generateProject(answers, options) {
 	}[options.install];
 
 	log(
-		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}.`,
+		`\nCreating a new Eleventy site in ${kleur.blue(path.resolve(project))}.`,
 	);
 	try {
 		await fs.mkdir(project, { recursive: true });
@@ -110,7 +110,7 @@ export async function generateProject(answers, options) {
 
 	if (options.verbose) {
 		log(`\nCreating some directories...`);
-		log(`- ${chalk.dim(dirs.input)}`);
+		log(`- ${kleur.dim(dirs.input)}`);
 	}
 
 	for (const dir of Object.values(dirs).filter(
@@ -118,7 +118,7 @@ export async function generateProject(answers, options) {
 	)) {
 		await fs.mkdir(dir, { recursive: true });
 		if (options.verbose) {
-			log(`- ${chalk.dim(dir)}`);
+			log(`- ${kleur.dim(dir)}`);
 		}
 	}
 
@@ -142,7 +142,7 @@ export async function generateProject(answers, options) {
 		),
 	);
 	if (options.verbose)
-		log(`- ${chalk.dim(path.join(project, properties.configFile))}`);
+		log(`- ${kleur.dim(path.join(project, properties.configFile))}`);
 
 	if (options.verbose) log(`\nCopying files...`);
 	for (let [source, destination] of Object.entries({
@@ -153,7 +153,7 @@ export async function generateProject(answers, options) {
 			path.join(__dirname, '..', '/lib/files', source),
 			path.join(destination),
 		);
-		if (options.verbose) log(`- ${chalk.dim(path.join(destination))}`);
+		if (options.verbose) log(`- ${kleur.dim(path.join(destination))}`);
 	}
 	const templates = {
 		'gitignore.hbs': path.join(project, '.gitignore'),
@@ -192,7 +192,7 @@ export async function generateProject(answers, options) {
 		compiledTemplates,
 	)) {
 		await fs.writeFile(path.join(outputFile), compiledTemplate(handlebarsData));
-		if (options.verbose) log(`- ${chalk.dim(path.join(outputFile))}`);
+		if (options.verbose) log(`- ${kleur.dim(path.join(outputFile))}`);
 	}
 
 	const dependencies = [
@@ -207,9 +207,9 @@ export async function generateProject(answers, options) {
 		total: dependencies.length,
 	});
 	log(
-		`\nInstalling dependencies (using ${chalk.cyan(
+		`\nInstalling dependencies (using ${kleur.cyan(
 			options.install,
-		)}):\n - ${chalk.cyan(dependencies.join('\n - '))}\n`,
+		)}):\n - ${kleur.cyan(dependencies.join('\n - '))}\n`,
 	);
 	log = console.log;
 	for (let dependency of dependencies) {
@@ -219,15 +219,15 @@ export async function generateProject(answers, options) {
 		bar.tick();
 	}
 	log(`
-${chalk.green('✓ Success!')} Created ${chalk.bold(project)}.
+${kleur.green('✓ Success!')} Created ${kleur.bold(project)}.
 
-${chalk.blue('Next steps:')}
+${kleur.blue('Next steps:')}
 
-- ${chalk.bold('cd', project)}
-- ${chalk.bold(options.runCmd, 'start')}
-- ${chalk.underline('https://www.11ty.dev/docs/')}
+- ${kleur.bold('cd', project)}
+- ${kleur.bold(options.runCmd, 'start')}
+- ${kleur.underline('https://www.11ty.dev/docs/')}
 
-${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(
+${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(
 		'Ctrl + C',
 	)} in your terminal.`);
 	process.exit(0);
