@@ -8,5 +8,16 @@
 			"plugins": ["@babel/plugin-syntax-import-assertions"]
 		}
 	},
-	"parser": "@babel/eslint-parser"
+	"parser": "@babel/eslint-parser",
+	"env": {
+		"node": true
+	},
+	"overrides": [
+		{
+			"files": ["lib/addons/filters/*.js"],
+			"rules": {
+				"no-undef": "off"
+			}
+		}
+	]
 }
