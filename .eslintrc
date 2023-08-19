@@ -10,7 +10,8 @@
 	},
 	"parser": "@babel/eslint-parser",
 	"env": {
-		"node": true
+		"node": true,
+		"es2021": true
 	},
 	"overrides": [
 		{

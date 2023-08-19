@@ -1,6 +1,6 @@
 import { addAddon } from './utils.js';
 
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import chalk from 'chalk';
 import child_process from 'child_process';
@@ -12,7 +12,7 @@ import Handlebars from 'handlebars';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-function createConfigFile({
+async function createConfigFile({
 	properties,
 	filters,
 	shortcodes,
@@ -24,13 +24,15 @@ function createConfigFile({
 		...(shortcodes || []),
 		...(collections || []),
 	];
-	let imports = [];
-	let setup = [];
+	let imports = new Set();
+	let setup = new Set();
 	for (let addon of addons) {
-		const output = addAddon(addon);
-		imports.push(...(output.imports || []));
-		setup.push(output.func);
+		const output = await addAddon(addon);
+		(output.imports || []).forEach((item) => imports.add(item));
+		setup.add(output.func);
 	}
+	imports = [...imports];
+	setup = [...setup];
 
 	let passthroughCopy = [];
 	for (let asset of Object.values(assets).filter(
@@ -70,14 +72,10 @@ module.exports = function (eleventyConfig) {
   };`;
 }
 
-export function generateProject(answers, options) {
+export async function generateProject(answers, options) {
 	const { project, filters, shortcodes, collections, properties, assets } =
 		answers;
-
-	const restoreLog = console.log;
-	if (options.silent) {
-		console.log = () => {};
-	}
+	let log = options.silent ? () => {} : console.log;
 	const dirs = {
 		input: path.join(project, properties.input),
 		includes: path.join(project, properties.input, properties.includes),
@@ -88,30 +86,35 @@ export function generateProject(answers, options) {
 		img: path.join(project, properties.input, assets.parent, assets.img),
 	};
 
-	console.log(
+	log(
 		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}.`,
 	);
-	if (!fs.existsSync(project)) {
-		fs.mkdirSync(project);
+	try {
+		await fs.mkdir(project, { recursive: true });
+	} catch {
+		log('Something went wrong while creating the project directory.');
+		process.exit(1);
 	}
-	fs.mkdirSync(dirs.input);
-	if (options.verbose) {
-		console.log(`\nCreating some directories...`);
-		console.log(`- ${chalk.dim(dirs.input)}`);
-	}
-	[...Object.values(dirs).filter((dir) => dir !== dirs.output)]
-		.filter((dir) => dir !== dirs.input)
-		.forEach((dir) => {
-			fs.mkdirSync(dir, { recursive: true });
-			if (options.verbose) {
-				console.log(`- ${chalk.dim(dir)}`);
-			}
-		});
+	await fs.mkdir(dirs.input);
 
-	fs.writeFileSync(
+	if (options.verbose) {
+		log(`\nCreating some directories...`);
+		log(`- ${chalk.dim(dirs.input)}`);
+	}
+
+	for (const dir of Object.values(dirs).filter(
+		(dir) => dir !== dirs.output && dir !== dirs.input,
+	)) {
+		await fs.mkdir(dir, { recursive: true });
+		if (options.verbose) {
+			log(`- ${chalk.dim(dir)}`);
+		}
+	}
+
+	await fs.writeFile(
 		path.join(project, properties.configFile),
 		prettier.format(
-			createConfigFile({
+			await createConfigFile({
 				properties,
 				filters,
 				shortcodes,
@@ -126,41 +129,40 @@ export function generateProject(answers, options) {
 				parser: 'babel',
 			},
 		),
-		function (err) {
-			if (err) throw err;
-		},
 	);
 	if (options.verbose)
-		console.log(`- ${chalk.dim(path.join(project, properties.configFile))}`);
+		log(`- ${chalk.dim(path.join(project, properties.configFile))}`);
 
-	if (options.verbose) console.log(`\nCopying files...`);
+	if (options.verbose) log(`\nCopying files...`);
 	for (let [source, destination] of Object.entries({
-		gitignore: path.join(project, '.gitignore'),
 		'logo.png': path.join(dirs.img, 'logo.png'),
 		'style.css': path.join(dirs.css, 'style.css'),
 	})) {
-		fs.copyFileSync(
+		await fs.copyFile(
 			path.join(__dirname, '..', '/lib/files', source),
 			path.join(destination),
 		);
-		if (options.verbose) console.log(`- ${chalk.dim(path.join(destination))}`);
+		if (options.verbose) log(`- ${chalk.dim(path.join(destination))}`);
 	}
 	const templates = {
+		'gitignore.hbs': path.join(project, '.gitignore'),
 		'README.md.hbs': path.join(project, 'README.md'),
 		'index.md.hbs': path.join(dirs.input, 'index.md'),
 		'base.njk.hbs': path.join(dirs.includes, 'base.njk'),
 		'package.json.hbs': path.join(project, 'package.json'),
 		'site.json.hbs': path.join(dirs.data, 'site.json'),
 	};
-	const compiledTemplates = Object.fromEntries(
-		Object.entries(templates).map(([templateFile, outputFile]) => {
-			const templateSource = fs.readFileSync(
-				path.join(__dirname, '..', 'lib', 'files', templateFile),
-				'utf8',
-			);
-			return [outputFile, Handlebars.compile(templateSource)];
-		}),
-	);
+
+	const compiledTemplates = {};
+
+	for (const [templateFile, outputFile] of Object.entries(templates)) {
+		const templateSource = await fs.readFile(
+			path.join(__dirname, '..', 'lib', 'files', templateFile),
+			'utf8',
+		);
+		compiledTemplates[outputFile] = Handlebars.compile(templateSource);
+	}
+
 	const handlebarsData = {
 		project,
 		input: properties.input,
@@ -173,13 +175,18 @@ export function generateProject(answers, options) {
 		configFile: properties.configFile,
 		includes: properties.includes,
 		data: properties.data,
+		runCmd: {
+			npm: 'npm run',
+			yarn: 'yarn',
+			pnpm: 'pnpm',
+		}[options.install],
 	};
-	Object.entries(compiledTemplates).forEach(
-		([outputFile, compiledTemplate]) => {
-			fs.writeFileSync(path.join(outputFile), compiledTemplate(handlebarsData));
-			if (options.verbose) console.log(`- ${chalk.dim(path.join(outputFile))}`);
-		},
-	);
+	for (const [outputFile, compiledTemplate] of Object.entries(
+		compiledTemplates,
+	)) {
+		await fs.writeFile(path.join(outputFile), compiledTemplate(handlebarsData));
+		if (options.verbose) log(`- ${chalk.dim(path.join(outputFile))}`);
+	}
 
 	const dependencies = [
 		'markdown-it',
@@ -192,12 +199,12 @@ export function generateProject(answers, options) {
 		width: 30,
 		total: dependencies.length,
 	});
-	console.log(
+	log(
 		`\nInstalling dependencies (using ${chalk.cyan(
 			options.install,
 		)}):\n - ${chalk.cyan(dependencies.join('\n - '))}\n`,
 	);
-	console.log = restoreLog;
+	log = console.log;
 	for (let dependency of dependencies) {
 		child_process.execSync(
 			`cd ${project} && ${
@@ -210,15 +217,13 @@ export function generateProject(answers, options) {
 		);
 		bar.tick();
 	}
-	console.log(`
-${chalk.green('✓ Success!')} Created ${chalk.bold(project)} at ${path.resolve(
-		project,
-	)}
+	log(`
+${chalk.green('✓ Success!')} Created ${chalk.bold(project)}.
 
 ${chalk.blue('Next steps:')}
 
 - ${chalk.bold('cd', project)}
-- ${chalk.bold(options.install + ' start')}
+- ${chalk.bold(options.install, 'start')}
 - ${chalk.underline('https://www.11ty.dev/docs/')}
 
 ${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(

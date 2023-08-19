@@ -9,9 +9,7 @@ import updateNotifier from 'update-notifier';
 import semver from 'semver';
 
 import { generateProject } from './src/init.js';
-import { queryPackage, dirExists } from './src/utils.js';
-
-const __version = packageJson.version;
+import { queryPackage, alreadyExists } from './src/utils.js';
 
 updateNotifier({
 	pkg: packageJson,
@@ -28,7 +26,7 @@ updateNotifier({
 
 const program = new Command();
 program
-	.version(__version)
+	.version(packageJson.version)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')
@@ -61,9 +59,9 @@ async function run() {
 	const project = await input({
 		message: 'What is your project named?',
 		default: 'my-project',
-		validate: (input) => {
-			if (dirExists(input)) {
-				return 'A directory with that name already exists.';
+		validate: async (input) => {
+			if (await alreadyExists(input)) {
+				return 'A file or directory with that name already exists.';
 			}
 			if (input.trim() === '') {
 				return 'Please enter a project name.';
@@ -162,7 +160,7 @@ async function run() {
 		properties: properties,
 		assets: assets,
 	};
-	generateProject(answers, options);
+	await generateProject(answers, options);
 }
 
 run();

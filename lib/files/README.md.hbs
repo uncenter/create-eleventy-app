@@ -1,26 +1,26 @@
-# Create Eleventy App
+# create-eleventy-app
 
 This is a starter template for [Eleventy](https://www.11ty.dev/).
-You can check out the [Eleventy documentation](https://www.11ty.dev/docs/) or join the [Eleventy community on Discord](https://discord.gg/GBkBy9u) to get help and ask questions.
+You can check out the [Eleventy documentation](https://www.11ty.dev/docs/) or join the [Eleventy community on Discord](https://discord.gg/GBkBy9u) to get help or ask questions.
 
-## Getting Started
+## Usage
 
-### Start the development server
+**Start the development server**:
 
 ```sh
-npm run start
+{{runCmd}} start
 ```
 
-### Build the site for production
+**Build the site for production**:
 
 ```sh
-npm run build
+{{runCmd}} build
 ```
 
-### Clean the output directory
+**Clean the output directory**:
 
 ```sh
-npm run clean
+{{runCmd}} clean
 ```
 
 ## Customizing
@@ -33,7 +33,7 @@ To add a new page, create a new file in the `{{input}}` directory. For example, 
 
 To add a new layout, create a new file in the `{{input}}/{{includes}}` directory. For example, to create a new layout for posts, create a file at `{{input}}/{{includes}}/post.njk`.
 
-### Modifying the site metadata
+### Modifying site metadata
 
 To modify the site metadata, edit the `{{input}}/{{data}}/site.json` file. Feel free to add, change, and remove any properties. 
 To use a property in a template, use `\{{ site.<property> }}`. For example, to use the site description in a template, use `\{{ site.description }}`.

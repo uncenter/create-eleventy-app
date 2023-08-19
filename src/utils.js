@@ -1,30 +1,35 @@
 import lodash from 'lodash';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-export function dirExists(pathString) {
-	if (!fs.existsSync(pathString)) {
-		return false;
-	} else if (fs.lstatSync(pathString).isDirectory()) {
-		if (fs.readdirSync(pathString).length > 0) {
+export async function alreadyExists(pathString) {
+	try {
+		const stats = await fs.stat(pathString);
+		if (stats.isFile()) {
+			// If it's a file, return true
 			return true;
-		} else {
-			return false;
+		} else if (stats.isDirectory()) {
+			// If it's a directory, check to see if it is empty
+			if ((await fs.readdir(pathString).length) === 0) {
+				return false;
+			} else {
+				return true;
+			}
 		}
-	} else {
-		throw new Error('Path is not a directory.');
+	} catch {
+		return false;
 	}
 }
 
-export function generateOptions(pathString) {
-	if (!fs.existsSync(pathString)) {
+export async function generateOptions(pathString) {
+	if (!(await alreadyExists(pathString))) {
 		throw new Error('Path does not exist.');
 	}
-	if (fs.lstatSync(pathString).isDirectory()) {
-		const files = fs.readdirSync(pathString);
+	if (await fs.stat(pathString).isDirectory()) {
+		const files = await fs.readdir(pathString);
 		let fileNames = [];
 		for (let file of files) {
 			if (
@@ -40,16 +45,16 @@ export function generateOptions(pathString) {
 		}
 		return fileNames;
 	} else {
-		const items = JSON.parse(fs.readFileSync(pathString, 'utf8'));
+		const items = JSON.parse(await fs.readFile(pathString, 'utf8'));
 		return Object.keys(items).map((item) => {
 			return { name: item };
 		});
 	}
 }
 
-export function debundle(bundle) {
+export async function debundle(bundle) {
 	bundle = JSON.parse(
-		fs.readFileSync(
+		await fs.readFile(
 			path.join(
 				__dirname,
 				'..',
@@ -67,14 +72,13 @@ export function debundle(bundle) {
 	};
 }
 
-function findFile(filename, parentDirectory) {
-	const files = fs.readdirSync(parentDirectory);
+async function findFile(filename, parentDirectory) {
+	const files = await fs.readdir(parentDirectory);
 	for (let file of files) {
-		if (fs.lstatSync(path.join(parentDirectory, file)).isDirectory()) {
-			const result = findFile(filename, path.join(parentDirectory, file));
-			if (result) {
-				return result;
-			}
+		const stat = await fs.stat(path.join(parentDirectory, file));
+		if (stat.isDirectory()) {
+			const result = await findFile(filename, path.join(parentDirectory, file));
+			if (result) return result;
 		} else if (file === filename) {
 			return path.join(parentDirectory, file);
 		}
@@ -82,16 +86,13 @@ function findFile(filename, parentDirectory) {
 	return false;
 }
 
-export function addAddon(addonName) {
-	let addon = fs
-		.readFileSync(
-			findFile(
-				addonName + '.js',
-				path.join(__dirname, '..', './lib/addons'),
-				'utf8',
-			),
-		)
-		.toString();
+export async function addAddon(addonName) {
+	const file = await findFile(
+		addonName + '.js',
+		path.join(__dirname, '..', './lib/addons'),
+		'utf8',
+	);
+	let addon = await fs.readFile(file, 'utf-8');
 	const imports = addon.match(/const\s+.*\s*=\s*require\(['"].*['"]\);/g);
 	if (imports) {
 		for (let imp of imports) {
