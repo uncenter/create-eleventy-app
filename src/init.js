@@ -75,7 +75,6 @@ module.exports = function (eleventyConfig) {
 export async function generateProject(answers, options) {
 	const { project, filters, shortcodes, collections, properties, assets } =
 		answers;
-	let log = options.silent ? () => {} : console.log;
 	const dirs = {
 		input: path.join(project, properties.input),
 		includes: path.join(project, properties.input, properties.includes),
@@ -85,6 +84,18 @@ export async function generateProject(answers, options) {
 		js: path.join(project, properties.input, assets.parent, assets.js),
 		img: path.join(project, properties.input, assets.parent, assets.img),
 	};
+	let log = options.silent ? () => {} : console.log;
+
+	options.runCmd = {
+		npm: 'npm run',
+		yarn: 'yarn',
+		pnpm: 'pnpm',
+	}[options.install];
+	options.installCmd = {
+		npm: 'npm install',
+		yarn: 'yarn add',
+		pnpm: 'pnpm add',
+	}[options.install];
 
 	log(
 		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}.`,
@@ -175,11 +186,7 @@ export async function generateProject(answers, options) {
 		configFile: properties.configFile,
 		includes: properties.includes,
 		data: properties.data,
-		runCmd: {
-			npm: 'npm run',
-			yarn: 'yarn',
-			pnpm: 'pnpm',
-		}[options.install],
+		runCmd: options.runCmd,
 	};
 	for (const [outputFile, compiledTemplate] of Object.entries(
 		compiledTemplates,
@@ -207,13 +214,7 @@ export async function generateProject(answers, options) {
 	log = console.log;
 	for (let dependency of dependencies) {
 		child_process.execSync(
-			`cd ${project} && ${
-				{
-					npm: 'npm install',
-					yarn: 'yarn add',
-					pnpm: 'pnpm add',
-				}[options.install]
-			} ${dependency}`,
+			`cd ${project} && ${options.installCmd} ${dependency}`,
 		);
 		bar.tick();
 	}
@@ -223,7 +224,7 @@ ${chalk.green('✓ Success!')} Created ${chalk.bold(project)}.
 ${chalk.blue('Next steps:')}
 
 - ${chalk.bold('cd', project)}
-- ${chalk.bold(options.install, 'start')}
+- ${chalk.bold(options.runCmd, 'start')}
 - ${chalk.underline('https://www.11ty.dev/docs/')}
 
 ${chalk.yellow('Note:')} To close the dev server, press ${chalk.bold(
