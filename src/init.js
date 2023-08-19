@@ -12,8 +12,18 @@ import Handlebars from 'handlebars';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-function createConfigFile({ properties, filters, shortcodes, collections, assets } = {}) {
-	const addons = [...(filters || []), ...(shortcodes || []), ...(collections || [])];
+function createConfigFile({
+	properties,
+	filters,
+	shortcodes,
+	collections,
+	assets,
+} = {}) {
+	const addons = [
+		...(filters || []),
+		...(shortcodes || []),
+		...(collections || []),
+	];
 	let imports = [];
 	let setup = [];
 	for (let addon of addons) {
@@ -23,7 +33,9 @@ function createConfigFile({ properties, filters, shortcodes, collections, assets
 	}
 
 	let passthroughCopy = [];
-	for (let asset of Object.values(assets).filter((asset) => assets.parent !== asset)) {
+	for (let asset of Object.values(assets).filter(
+		(asset) => assets.parent !== asset,
+	)) {
 		passthroughCopy.push(
 			`eleventyConfig.addPassthroughCopy(${JSON.stringify(
 				path.join(properties.input, assets.parent, asset),
@@ -59,7 +71,8 @@ module.exports = function (eleventyConfig) {
 }
 
 export function generateProject(answers, options) {
-	const { project, filters, shortcodes, collections, properties, assets } = answers;
+	const { project, filters, shortcodes, collections, properties, assets } =
+		answers;
 
 	const restoreLog = console.log;
 	if (options.silent) {
@@ -75,7 +88,9 @@ export function generateProject(answers, options) {
 		img: path.join(project, properties.input, assets.parent, assets.img),
 	};
 
-	console.log(`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}.`);
+	console.log(
+		`\nCreating a new Eleventy site in ${chalk.blue(path.resolve(project))}.`,
+	);
 	if (!fs.existsSync(project)) {
 		fs.mkdirSync(project);
 	}
@@ -159,12 +174,18 @@ export function generateProject(answers, options) {
 		includes: properties.includes,
 		data: properties.data,
 	};
-	Object.entries(compiledTemplates).forEach(([outputFile, compiledTemplate]) => {
-		fs.writeFileSync(path.join(outputFile), compiledTemplate(handlebarsData));
-		if (options.verbose) console.log(`- ${chalk.dim(path.join(outputFile))}`);
-	});
+	Object.entries(compiledTemplates).forEach(
+		([outputFile, compiledTemplate]) => {
+			fs.writeFileSync(path.join(outputFile), compiledTemplate(handlebarsData));
+			if (options.verbose) console.log(`- ${chalk.dim(path.join(outputFile))}`);
+		},
+	);
 
-	const dependencies = ['markdown-it', '@11ty/eleventy@' + options.set, 'rimraf'];
+	const dependencies = [
+		'markdown-it',
+		'@11ty/eleventy@' + options.set,
+		'rimraf',
+	];
 	var bar = new ProgressBar(':bar :percent', {
 		complete: '▓',
 		incomplete: '░',
@@ -172,9 +193,9 @@ export function generateProject(answers, options) {
 		total: dependencies.length,
 	});
 	console.log(
-		`\nInstalling dependencies (using ${chalk.cyan(options.install)}):\n - ${chalk.cyan(
-			dependencies.join('\n - '),
-		)}\n`,
+		`\nInstalling dependencies (using ${chalk.cyan(
+			options.install,
+		)}):\n - ${chalk.cyan(dependencies.join('\n - '))}\n`,
 	);
 	console.log = restoreLog;
 	for (let dependency of dependencies) {
@@ -190,7 +211,9 @@ export function generateProject(answers, options) {
 		bar.tick();
 	}
 	console.log(`
-${chalk.green('✓ Success!')} Created ${chalk.bold(project)} at ${path.resolve(project)}
+${chalk.green('✓ Success!')} Created ${chalk.bold(project)} at ${path.resolve(
+		project,
+	)}
 
 ${chalk.blue('Next steps:')}
 

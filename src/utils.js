@@ -85,7 +85,11 @@ function findFile(filename, parentDirectory) {
 export function addAddon(addonName) {
 	let addon = fs
 		.readFileSync(
-			findFile(addonName + '.js', path.join(__dirname, '..', './lib/addons'), 'utf8'),
+			findFile(
+				addonName + '.js',
+				path.join(__dirname, '..', './lib/addons'),
+				'utf8',
+			),
 		)
 		.toString();
 	const imports = addon.match(/const\s+.*\s*=\s*require\(['"].*['"]\);/g);
