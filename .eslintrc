@@ -3,12 +3,8 @@
 	"parserOptions": {
 		"requireConfigFile": false,
 		"ecmaVersion": "latest",
-		"sourceType": "module",
-		"babelOptions": {
-			"plugins": ["@babel/plugin-syntax-import-assertions"]
-		}
+		"sourceType": "module"
 	},
-	"parser": "@babel/eslint-parser",
 	"env": {
 		"node": true,
 		"es2021": true

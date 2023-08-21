@@ -1,32 +1,18 @@
-#!/usr/bin/env node --no-warnings
-import packageJson from './package.json' assert { type: 'json' };
+#!/usr/bin/env node
+import Package from 'paketo';
 
 import { input, confirm, select } from '@inquirer/prompts';
 import { Command, Option } from 'commander';
 
 import lodash from 'lodash';
-import updateNotifier from 'update-notifier';
 import semver from 'semver';
 
 import { generateProject } from './src/init.js';
 import { queryPackage, alreadyExists } from './src/utils.js';
 
-updateNotifier({
-	pkg: packageJson,
-	updateCheckInterval: 1000 * 60 * 60 * 12,
-	isGlobal: true,
-	boxenOptions: {
-		padding: 1,
-		margin: 1,
-		textAlignment: 'center',
-		borderColor: 'cyan',
-		borderStyle: 'bold',
-	},
-}).notify();
-
 const program = new Command();
 program
-	.version(packageJson.version)
+	.version(Package.version)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')
