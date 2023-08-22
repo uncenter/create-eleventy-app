@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-import Package from 'paketo';
 
-import { input, confirm, select } from '@inquirer/prompts';
-import { Command, Option } from 'commander';
+import fs from 'node:fs/promises';
 
 import lodash from 'lodash';
 import semver from 'semver';
 
+import { input, confirm, select } from '@inquirer/prompts';
+import { Command, Option } from 'commander';
 import { generateProject } from './src/init.js';
 import { queryPackage, alreadyExists } from './src/utils.js';
 
 const program = new Command();
 program
-	.version(Package.version)
+	.version(JSON.parse(await fs.readFile('./package.json')).version)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')

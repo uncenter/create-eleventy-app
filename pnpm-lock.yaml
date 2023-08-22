@@ -20,9 +20,6 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
-  paketo:
-    specifier: ^1.0.1
-    version: 1.0.1
   prettier:
     specifier: ^3.0.2
     version: 3.0.2
@@ -545,10 +542,6 @@ packages:
       flat-cache: 3.0.4
     dev: true
 
-  /find-up-json@2.0.2:
-    resolution: {integrity: sha512-UpHMIdzLzZNHZ0vXVv3kHr2vq2MWA+hA8zlzlPH5XMGyYisIr/7/dNm5AjWR3ae6Onie9a1zgtExOqix+8ESQw==}
-    dev: false
-
   /find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
@@ -795,13 +788,6 @@ packages:
       p-limit: 3.1.0
     dev: true
 
-  /paketo@1.0.1:
-    resolution: {integrity: sha512-PQdvUOilvjqUmmo9B2H6iC+Q54Z/B1iHCk2BHwPSt4cnnsuzyy5iG6TP40UgIAv/RxuddgWPs3OA8tglPXz2nQ==}
-    dependencies:
-      find-up-json: 2.0.2
-      tiny-dirname: 1.0.0
-    dev: false
-
   /parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -935,10 +921,6 @@ packages:
   /text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
     dev: true
-
-  /tiny-dirname@1.0.0:
-    resolution: {integrity: sha512-APSJlSu0ZMH+fsJt7+DCTh81JMhOdEyJHAkuShSfW+rKfHqOWjG8tbcYtfERtRSAhyY4uuHr7SB0oBCfD5VZLQ==}
-    dev: false
 
   /tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}

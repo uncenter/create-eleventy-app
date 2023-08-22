@@ -1,9 +1,10 @@
-import lodash from 'lodash';
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import * as url from 'url';
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+import lodash from 'lodash';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export async function alreadyExists(pathString) {
 	try {

@@ -1,16 +1,16 @@
-import { addAddon } from './utils.js';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import child_process from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-import fs from 'fs/promises';
-import path from 'path';
 import kleur from 'kleur';
-import child_process from 'child_process';
-import * as prettier from 'prettier';
-
 import ProgressBar from 'progress';
 import Handlebars from 'handlebars';
 
-import * as url from 'url';
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+import { addAddon } from './utils.js';
+import { format } from 'prettier';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 async function createConfigFile({
 	properties,
@@ -124,7 +124,7 @@ export async function generateProject(answers, options) {
 
 	await fs.writeFile(
 		path.join(project, properties.configFile),
-		await prettier.format(
+		await format(
 			await createConfigFile({
 				properties,
 				filters,
