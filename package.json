@@ -10,6 +10,9 @@
 	"license": "MIT",
 	"type": "module",
 	"exports": "./index.js",
+	"bin": {
+		"create-eleventy-app": "./index.js"
+	},
 	"dependencies": {
 		"@inquirer/prompts": "^3.0.3",
 		"commander": "^11.0.0",
