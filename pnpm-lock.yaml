@@ -20,6 +20,9 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  paketo:
+    specifier: ^1.0.1
+    version: 1.0.1
   prettier:
     specifier: ^3.0.2
     version: 3.0.2
@@ -37,9 +40,6 @@ devDependencies:
   eslint-config-prettier:
     specifier: ^9.0.0
     version: 9.0.0(eslint@8.47.0)
-  paketo:
-    specifier: ^1.0.1
-    version: 1.0.1
 
 packages:
 
@@ -547,7 +547,7 @@ packages:
 
   /find-up-json@2.0.2:
     resolution: {integrity: sha512-UpHMIdzLzZNHZ0vXVv3kHr2vq2MWA+hA8zlzlPH5XMGyYisIr/7/dNm5AjWR3ae6Onie9a1zgtExOqix+8ESQw==}
-    dev: true
+    dev: false
 
   /find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
@@ -800,7 +800,7 @@ packages:
     dependencies:
       find-up-json: 2.0.2
       tiny-dirname: 1.0.0
-    dev: true
+    dev: false
 
   /parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -938,7 +938,7 @@ packages:
 
   /tiny-dirname@1.0.0:
     resolution: {integrity: sha512-APSJlSu0ZMH+fsJt7+DCTh81JMhOdEyJHAkuShSfW+rKfHqOWjG8tbcYtfERtRSAhyY4uuHr7SB0oBCfD5VZLQ==}
-    dev: true
+    dev: false
 
   /tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
