@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import lodash from 'lodash';
 import semver from 'semver';
@@ -10,9 +12,13 @@ import { Command, Option } from 'commander';
 import { generateProject } from './src/init.js';
 import { queryPackage, alreadyExists } from './src/utils.js';
 
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
 const program = new Command();
 program
-	.version(JSON.parse(await fs.readFile('./package.json')).version)
+	.version(
+		JSON.parse(await fs.readFile(path.join(__dirname, 'package.json'))).version,
+	)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')
