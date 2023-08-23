@@ -8,6 +8,13 @@
 		"url": "https://github.com/uncenter/create-eleventy-app.git"
 	},
 	"license": "MIT",
+	"files": [
+		"LICENSE",
+		"README.md",
+		"lib/",
+		"src/",
+		"index.js"
+	],
 	"type": "module",
 	"exports": "./index.js",
 	"bin": {
