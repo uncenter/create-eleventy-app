@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import lodash from 'lodash';
+import kebab from 'just-kebab-case';
 import semver from 'semver';
 
 import { input, confirm, select } from '@inquirer/prompts';
@@ -147,7 +147,7 @@ async function run() {
 	}
 
 	const answers = {
-		project: lodash.kebabCase(project),
+		project: kebab(project),
 		...customizations,
 		properties: properties,
 		assets: assets,

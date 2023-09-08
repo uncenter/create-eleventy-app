@@ -2,8 +2,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import lodash from 'lodash';
-
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export async function alreadyExists(pathString) {
@@ -23,54 +21,6 @@ export async function alreadyExists(pathString) {
 	} catch {
 		return false;
 	}
-}
-
-export async function generateOptions(pathString) {
-	if (!(await alreadyExists(pathString))) {
-		throw new Error('Path does not exist.');
-	}
-	if (await fs.stat(pathString).isDirectory()) {
-		const files = await fs.readdir(pathString);
-		let fileNames = [];
-		for (let file of files) {
-			if (
-				path.parse(file).ext === '.md' ||
-				path.parse(file).ext === '.json' ||
-				path.parse(file).ext === '.njk'
-			) {
-				file = lodash.startCase(path.parse(file).name);
-			} else {
-				file = path.parse(file).name;
-			}
-			fileNames.push({ name: file });
-		}
-		return fileNames;
-	} else {
-		const items = JSON.parse(await fs.readFile(pathString, 'utf8'));
-		return Object.keys(items).map((item) => {
-			return { name: item };
-		});
-	}
-}
-
-export async function debundle(bundle) {
-	bundle = JSON.parse(
-		await fs.readFile(
-			path.join(
-				__dirname,
-				'..',
-				'./lib/addons/bundles',
-				lodash.kebabCase(bundle) + '.json',
-			),
-			'utf8',
-		),
-	);
-	return {
-		plugins: bundle.plugins,
-		filters: bundle.filters,
-		shortcodes: bundle.shortcodes,
-		collections: bundle.collections,
-	};
 }
 
 async function findFile(filename, parentDirectory) {

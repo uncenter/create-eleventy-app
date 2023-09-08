@@ -24,8 +24,8 @@
 		"@inquirer/prompts": "^3.0.3",
 		"commander": "^11.0.0",
 		"handlebars": "^4.7.8",
+		"just-kebab-case": "^4.2.0",
 		"kleur": "^4.1.5",
-		"lodash": "^4.17.21",
 		"prettier": "^3.0.2",
 		"progress": "^2.0.3",
 		"semver": "^7.5.4"
