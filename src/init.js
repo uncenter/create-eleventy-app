@@ -4,11 +4,11 @@ import child_process from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import kleur from 'kleur';
+import handlebars from 'handlebars';
+import prettier from 'prettier';
 import ProgressBar from 'progress';
-import Handlebars from 'handlebars';
 
 import { addAddon } from './utils.js';
-import { format } from 'prettier';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -124,7 +124,7 @@ export async function generateProject(answers, options) {
 
 	await fs.writeFile(
 		path.join(project, properties.configFile),
-		await format(
+		await prettier.format(
 			await createConfigFile({
 				properties,
 				filters,
@@ -171,7 +171,7 @@ export async function generateProject(answers, options) {
 			path.join(__dirname, '..', 'lib', 'files', templateFile),
 			'utf8',
 		);
-		compiledTemplates[outputFile] = Handlebars.compile(templateSource);
+		compiledTemplates[outputFile] = handlebars.compile(templateSource);
 	}
 
 	const handlebarsData = {

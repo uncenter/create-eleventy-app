@@ -7,10 +7,10 @@ import { fileURLToPath } from 'node:url';
 import kebab from 'just-kebab-case';
 import semver from 'semver';
 
-import { input, confirm, select } from '@inquirer/prompts';
+import { confirm, input, select } from '@inquirer/prompts';
 import { Command, Option } from 'commander';
 import { generateProject } from './src/init.js';
-import { queryPackage, alreadyExists } from './src/utils.js';
+import { alreadyExists, queryPackage } from './src/utils.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
