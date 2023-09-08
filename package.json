@@ -2,7 +2,7 @@
 	"name": "create-eleventy-app",
 	"version": "1.6.11",
 	"description": "An easy-to-use CLI tool to quickly create a fresh Eleventy project.",
-	"author": "uncenter (https://uncenter.dev)",
+	"author": "uncenter <hi@uncenter.dev>",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/uncenter/create-eleventy-app.git"
@@ -37,5 +37,5 @@
 		"eslint": "^8.47.0",
 		"eslint-config-prettier": "^9.0.0"
 	},
-	"packageManager": "pnpm@8.6.12"
+	"packageManager": "pnpm@8.7.4"
 }
