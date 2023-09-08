@@ -8,10 +8,8 @@ export async function alreadyExists(pathString) {
 	try {
 		const stats = await fs.stat(pathString);
 		if (stats.isFile()) {
-			// If it's a file, return true
 			return true;
 		} else if (stats.isDirectory()) {
-			// If it's a directory, check to see if it is empty
 			if ((await fs.readdir(pathString).length) === 0) {
 				return false;
 			} else {
