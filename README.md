@@ -31,7 +31,7 @@ Set the version of Eleventy to install.
 
 ## Credits
 
-- [Brett Jankord's `create-eleventy-site`](https://github.com/bjankord/create-eleventy-site) for the design of the start page.
+- Thanks to [Brett Jankord's `create-eleventy-site`](https://github.com/bjankord/create-eleventy-site) for the design of the start page.
 
 ## License
 
