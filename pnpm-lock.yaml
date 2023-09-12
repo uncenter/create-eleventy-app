@@ -20,6 +20,9 @@ dependencies:
   kleur:
     specifier: ^4.1.5
     version: 4.1.5
+  loogu:
+    specifier: ^0.2.0
+    version: 0.2.0
   prettier:
     specifier: ^3.0.3
     version: 3.0.3
@@ -727,6 +730,12 @@ packages:
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
+
+  /loogu@0.2.0:
+    resolution: {integrity: sha512-aMbKdnhpRd6Q2v0PIhienRFKuaoFmBF87Bsnv6W9jGTcykpcRzWn7DPhb/nn3b92UqbFJ6PrbwU9rTYzmUYFWw==}
+    dependencies:
+      kleur: 4.1.5
+    dev: false
 
   /lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}

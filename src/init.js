@@ -1,16 +1,16 @@
+import child_process from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import child_process from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
-import kleur from 'kleur';
 import handlebars from 'handlebars';
+import kleur from 'kleur';
 import prettier from 'prettier';
 import ProgressBar from 'progress';
 
+import { dirname, packageManagers } from './constants.js';
 import { addAddon } from './utils.js';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const __dirname = dirname(import.meta.url);
 
 async function createConfigFile({
 	properties,
@@ -50,12 +50,12 @@ const markdownIt = require('markdown-it');
 ${imports.join('\n').concat('\n')}
 
 module.exports = function (eleventyConfig) {
-    const mdLib = markdownIt({
+    const markdownLibrary = markdownIt({
         html: true,
         breaks: true,
         linkify: true
     });
-    eleventyConfig.setLibrary("md", mdLib);
+    eleventyConfig.setLibrary("md", markdownLibrary);
 
     ${setup.join('\n')}
 
@@ -84,33 +84,24 @@ export async function generateProject(answers, options) {
 		js: path.join(project, properties.input, assets.parent, assets.js),
 		img: path.join(project, properties.input, assets.parent, assets.img),
 	};
-	let log = options.silent ? () => {} : console.log;
 
-	options.runCmd = {
-		npm: 'npm run',
-		yarn: 'yarn',
-		pnpm: 'pnpm',
-	}[options.install];
-	options.installCmd = {
-		npm: 'npm install',
-		yarn: 'yarn add',
-		pnpm: 'pnpm add',
-	}[options.install];
+	const restoreLog = console.log;
+	console.log = options.silent ? () => {} : console.log;
 
-	log(
+	console.log(
 		`\nCreating a new Eleventy site in ${kleur.blue(path.resolve(project))}.`,
 	);
 	try {
 		await fs.mkdir(project, { recursive: true });
 	} catch {
-		log('Something went wrong while creating the project directory.');
+		console.log('Something went wrong while creating the project directory.');
 		process.exit(1);
 	}
 	await fs.mkdir(dirs.input);
 
 	if (options.verbose) {
-		log(`\nCreating some directories...`);
-		log(`- ${kleur.dim(dirs.input)}`);
+		console.log(`\nCreating some directories...`);
+		console.log(`- ${kleur.dim(dirs.input)}`);
 	}
 
 	for (const dir of Object.values(dirs).filter(
@@ -118,7 +109,7 @@ export async function generateProject(answers, options) {
 	)) {
 		await fs.mkdir(dir, { recursive: true });
 		if (options.verbose) {
-			log(`- ${kleur.dim(dir)}`);
+			console.log(`- ${kleur.dim(dir)}`);
 		}
 	}
 
@@ -142,9 +133,9 @@ export async function generateProject(answers, options) {
 		),
 	);
 	if (options.verbose)
-		log(`- ${kleur.dim(path.join(project, properties.configFile))}`);
+		console.log(`- ${kleur.dim(path.join(project, properties.configFile))}`);
 
-	if (options.verbose) log(`\nCopying files...`);
+	if (options.verbose) console.log(`\nCopying files...`);
 	for (let [source, destination] of Object.entries({
 		'logo.png': path.join(dirs.img, 'logo.png'),
 		'style.css': path.join(dirs.css, 'style.css'),
@@ -153,7 +144,7 @@ export async function generateProject(answers, options) {
 			path.join(__dirname, '..', '/lib/files', source),
 			path.join(destination),
 		);
-		if (options.verbose) log(`- ${kleur.dim(path.join(destination))}`);
+		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
 	const templates = {
 		'gitignore.hbs': path.join(project, '.gitignore'),
@@ -186,13 +177,13 @@ export async function generateProject(answers, options) {
 		configFile: properties.configFile,
 		includes: properties.includes,
 		data: properties.data,
-		runCmd: options.runCmd,
+		runCmd: packageManagers[options.install].run,
 	};
 	for (const [outputFile, compiledTemplate] of Object.entries(
 		compiledTemplates,
 	)) {
 		await fs.writeFile(path.join(outputFile), compiledTemplate(handlebarsData));
-		if (options.verbose) log(`- ${kleur.dim(path.join(outputFile))}`);
+		if (options.verbose) console.log(`- ${kleur.dim(path.join(outputFile))}`);
 	}
 
 	const dependencies = [
@@ -206,25 +197,27 @@ export async function generateProject(answers, options) {
 		width: 30,
 		total: dependencies.length,
 	});
-	log(
+	console.log(
 		`\nInstalling dependencies (using ${kleur.cyan(
 			options.install,
 		)}):\n - ${kleur.cyan(dependencies.join('\n - '))}\n`,
 	);
-	log = console.log;
+	console.log = restoreLog;
 	for (let dependency of dependencies) {
 		child_process.execSync(
-			`cd ${project} && ${options.installCmd} ${dependency}`,
+			`cd ${project} && ${
+				packageManagers[options.install].install
+			} ${dependency}`,
 		);
 		bar.tick();
 	}
-	log(`
+	console.log(`
 ${kleur.green('✓ Success!')} Created ${kleur.bold(project)}.
 
 ${kleur.blue('Next steps:')}
 
 - ${kleur.bold('cd ' + project)}
-- ${kleur.bold(options.runCmd + ' start')}
+- ${kleur.bold(packageManagers[options.install].run + ' start')}
 - ${kleur.underline('https://www.11ty.dev/docs/')}
 
 ${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(

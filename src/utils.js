@@ -1,8 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+import { dirname } from './constants.js';
+
+const __dirname = dirname(import.meta.url);
 
 export async function alreadyExists(pathString) {
 	try {
@@ -52,22 +53,15 @@ export async function addAddon(addonName) {
 	return { imports, func };
 }
 
-export async function queryPackage(packageName, version = null) {
+export async function queryPackage(pkg, version = null) {
 	const res = await fetch(
-		`https://registry.npmjs.org/${packageName}${version ? '/' + version : ''}`,
+		`https://registry.npmjs.org/${pkg}${version ? '/' + version : ''}`,
 	);
-	const data = await res.json();
-	function getLatestVersion() {
-		const versions = Object.keys(data.versions);
-		return versions[versions.length - 1];
-	}
-	function getAllVersions() {
-		return Object.keys(data.versions);
-	}
+	const { name, description, versions } = await res.json();
 	return {
-		name: data.name,
-		description: data.description,
-		version: getLatestVersion(),
-		versions: getAllVersions(),
+		name: name,
+		description: description,
+		version: Object.keys(versions).at(-1),
+		versions: Object.keys(versions),
 	};
 }
