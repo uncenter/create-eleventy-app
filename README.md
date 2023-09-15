@@ -1,14 +1,13 @@
-<h1>create-eleventy-app</h1>
+# create-eleventy-app
 
-[![npm version](https://img.shields.io/npm/v/create-eleventy-app?style=flat-square&color=red)](https://www.npmjs.com/package/create-eleventy-app)
-
-<p>An unopinionated CLI for creating Eleventy project boilerplate in seconds.</p>
+A simple CLI for creating an Eleventy project in seconds.
 
 ## Usage
 
 ```sh
 npx create-eleventy-app@latest
 pnpm dlx create-eleventy-app@latest
+bunx create-eleventy-app@latest
 ```
 
 ### Options
