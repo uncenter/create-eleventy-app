@@ -8,15 +8,8 @@ const __dirname = dirname(import.meta.url);
 export async function alreadyExists(pathString) {
 	try {
 		const stats = await fs.stat(pathString);
-		if (stats.isFile()) {
-			return true;
-		} else if (stats.isDirectory()) {
-			if ((await fs.readdir(pathString).length) === 0) {
-				return false;
-			} else {
-				return true;
-			}
-		}
+		if (stats.isFile()) return true;
+		return (await fs.readdir(pathString)).length !== 0;
 	} catch {
 		return false;
 	}
