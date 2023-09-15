@@ -5,6 +5,7 @@ import { join } from 'node:path';
 
 import kebab from 'just-kebab-case';
 import semver from 'semver';
+import detectPackageManager from 'which-pm-runs';
 
 import { confirm, input, select } from '@inquirer/prompts';
 import { Command, Option } from 'commander';
@@ -31,7 +32,8 @@ program
 		)
 			.choices(Object.keys(packageManagers))
 			.default(
-				Object.keys(packageManagers).find((x) => packageManagers[x].default),
+				detectPackageManager()?.name ||
+					Object.keys(packageManagers).find((x) => packageManagers[x].default),
 			),
 	);
 

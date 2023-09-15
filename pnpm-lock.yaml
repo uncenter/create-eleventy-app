@@ -32,6 +32,9 @@ dependencies:
   semver:
     specifier: ^7.5.4
     version: 7.5.4
+  which-pm-runs:
+    specifier: ^1.1.0
+    version: 1.1.0
 
 devDependencies:
   eslint:
@@ -979,6 +982,11 @@ packages:
     dependencies:
       punycode: 2.3.0
     dev: true
+
+  /which-pm-runs@1.1.0:
+    resolution: {integrity: sha512-n1brCuqClxfFfq/Rb0ICg9giSZqCS+pLtccdag6C2HyufBrh3fBOiy9nb6ggRMvWOVH5GrdJskj5iGTZNxd7SA==}
+    engines: {node: '>=4'}
+    dev: false
 
   /which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
