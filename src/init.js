@@ -46,17 +46,9 @@ async function createConfigFile({
 	}
 
 	return `
-const markdownIt = require('markdown-it');
 ${imports.join('\n').concat('\n')}
 
 module.exports = function (eleventyConfig) {
-    const markdownLibrary = markdownIt({
-        html: true,
-        breaks: true,
-        linkify: true
-    });
-    eleventyConfig.setLibrary("md", markdownLibrary);
-
     ${setup.join('\n')}
 
     ${passthroughCopy.join('\n')}
@@ -94,8 +86,9 @@ export async function generateProject(answers, options) {
 	try {
 		await fs.mkdir(project, { recursive: true });
 	} catch {
-		console.log('Something went wrong while creating the project directory.');
-		process.exit(1);
+		throw new Error(
+			'Something went wrong while creating the project directory.',
+		);
 	}
 	await fs.mkdir(dirs.input);
 
@@ -108,9 +101,7 @@ export async function generateProject(answers, options) {
 		(dir) => dir !== dirs.output && dir !== dirs.input,
 	)) {
 		await fs.mkdir(dir, { recursive: true });
-		if (options.verbose) {
-			console.log(`- ${kleur.dim(dir)}`);
-		}
+		if (options.verbose) console.log(`- ${kleur.dim(dir)}`);
 	}
 
 	await fs.writeFile(
@@ -132,10 +123,10 @@ export async function generateProject(answers, options) {
 			},
 		),
 	);
-	if (options.verbose)
+	if (options.verbose) {
 		console.log(`- ${kleur.dim(path.join(project, properties.configFile))}`);
-
-	if (options.verbose) console.log(`\nCopying files...`);
+		console.log(`\nCopying files...`);
+	}
 	for (let [source, destination] of Object.entries({
 		'logo.png': path.join(dirs.img, 'logo.png'),
 		'style.css': path.join(dirs.css, 'style.css'),
@@ -146,6 +137,7 @@ export async function generateProject(answers, options) {
 		);
 		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
+
 	const templates = {
 		'gitignore.hbs': path.join(project, '.gitignore'),
 		'README.md.hbs': path.join(project, 'README.md'),
@@ -154,44 +146,38 @@ export async function generateProject(answers, options) {
 		'package.json.hbs': path.join(project, 'package.json'),
 		'site.json.hbs': path.join(dirs.data, 'site.json'),
 	};
-
 	const compiledTemplates = {};
-
-	for (const [templateFile, outputFile] of Object.entries(templates)) {
+	for (const [file, dest] of Object.entries(templates)) {
 		const templateSource = await fs.readFile(
-			path.join(__dirname, '..', 'lib', 'files', templateFile),
+			path.join(__dirname, '..', 'lib', 'files', file),
 			'utf8',
 		);
-		compiledTemplates[outputFile] = handlebars.compile(templateSource);
+		compiledTemplates[dest] = handlebars.compile(templateSource);
 	}
 
-	const handlebarsData = {
-		project,
-		input: properties.input,
-		output: properties.output,
-		assets: {
-			img: path.join(assets.parent, assets.img),
-			css: path.join(assets.parent, assets.css),
-			js: path.join(assets.parent, assets.js),
-		},
-		configFile: properties.configFile,
-		includes: properties.includes,
-		data: properties.data,
-		runCmd: packageManagers[options.install].run,
-	};
-	for (const [outputFile, compiledTemplate] of Object.entries(
-		compiledTemplates,
-	)) {
-		await fs.writeFile(path.join(outputFile), compiledTemplate(handlebarsData));
-		if (options.verbose) console.log(`- ${kleur.dim(path.join(outputFile))}`);
+	for (const [dest, template] of Object.entries(compiledTemplates)) {
+		await fs.writeFile(
+			path.join(dest),
+			template({
+				project,
+				input: properties.input,
+				output: properties.output,
+				assets: {
+					img: path.join(assets.parent, assets.img),
+					css: path.join(assets.parent, assets.css),
+					js: path.join(assets.parent, assets.js),
+				},
+				configFile: properties.configFile,
+				includes: properties.includes,
+				data: properties.data,
+				runCmd: packageManagers[options.install].run,
+			}),
+		);
+		if (options.verbose) console.log(`- ${kleur.dim(path.join(dest))}`);
 	}
 
-	const dependencies = [
-		'markdown-it',
-		'@11ty/eleventy@' + options.set,
-		'rimraf',
-	];
-	var bar = new ProgressBar(':bar :percent', {
+	const dependencies = ['@11ty/eleventy@' + options.set, 'rimraf'];
+	const bar = new ProgressBar(':bar :percent', {
 		complete: '▓',
 		incomplete: '░',
 		width: 30,
