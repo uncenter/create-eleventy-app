@@ -7,7 +7,7 @@ import kleur from 'kleur';
 import prettier from 'prettier';
 import ProgressBar from 'progress';
 
-import { dirname, packageManagers } from './constants.js';
+import { dirname, packageManager } from './constants.js';
 import { addAddon } from './utils.js';
 
 const __dirname = dirname(import.meta.url);
@@ -170,7 +170,7 @@ export async function generateProject(answers, options) {
 				configFile: properties.configFile,
 				includes: properties.includes,
 				data: properties.data,
-				runCmd: packageManagers[options.install].run,
+				runCmd: packageManager(options.install).run,
 			}),
 		);
 		if (options.verbose) console.log(`- ${kleur.dim(path.join(dest))}`);
@@ -192,7 +192,7 @@ export async function generateProject(answers, options) {
 	for (let dependency of dependencies) {
 		child_process.execSync(
 			`cd ${project} && ${
-				packageManagers[options.install].install
+				packageManager(options.install).install
 			} ${dependency}`,
 		);
 		bar.tick();
@@ -203,7 +203,7 @@ ${kleur.green('✓ Success!')} Created ${kleur.bold(project)}.
 ${kleur.blue('Next steps:')}
 
 - ${kleur.bold('cd ' + project)}
-- ${kleur.bold(packageManagers[options.install].run + ' start')}
+- ${kleur.bold(packageManager(options.install).run + ' start')}
 - ${kleur.underline('https://www.11ty.dev/docs/')}
 
 ${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(

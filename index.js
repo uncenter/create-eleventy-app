@@ -12,7 +12,12 @@ import { Command, Option } from 'commander';
 
 import { generateProject } from './src/init.js';
 import { alreadyExists, queryPackage } from './src/utils.js';
-import { dirname, log, packageManagers } from './src/constants.js';
+import {
+	dirname,
+	log,
+	packageManager,
+	packageManagers,
+} from './src/constants.js';
 
 const __dirname = dirname(import.meta.url);
 
@@ -30,11 +35,8 @@ program
 			'-i, --install <package-manager>',
 			'install dependencies using specified package manager',
 		)
-			.choices(Object.keys(packageManagers))
-			.default(
-				detectPackageManager()?.name ||
-					Object.keys(packageManagers).find((x) => packageManagers[x].default),
-			),
+			.choices(packageManagers)
+			.default(detectPackageManager()?.name || packageManager().name),
 	);
 
 program.parse(process.argv);
