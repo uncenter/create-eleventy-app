@@ -24,7 +24,7 @@
 		"create-eleventy-app": "./index.js"
 	},
 	"dependencies": {
-		"@inquirer/prompts": "^3.0.3",
+		"@inquirer/prompts": "^3.2.0",
 		"commander": "^11.0.0",
 		"handlebars": "^4.7.8",
 		"just-kebab-case": "^4.2.0",
@@ -36,7 +36,7 @@
 		"which-pm-runs": "^1.1.0"
 	},
 	"devDependencies": {
-		"eslint": "^8.47.0",
+		"eslint": "^8.50.0",
 		"eslint-config-prettier": "^9.0.0"
 	},
 	"packageManager": "pnpm@8.8.0"
