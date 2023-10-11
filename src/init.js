@@ -81,7 +81,9 @@ export async function generateProject(answers, options) {
 	console.log = options.silent ? () => {} : console.log;
 
 	console.log(
-		`\nCreating a new Eleventy site in ${kleur.blue(path.resolve(project))}.`,
+		`\nCreating a new Eleventy site in ${kleur.blue(
+			path.resolve(project),
+		)}.`,
 	);
 	try {
 		await fs.mkdir(project, { recursive: true });
@@ -124,7 +126,9 @@ export async function generateProject(answers, options) {
 		),
 	);
 	if (options.verbose) {
-		console.log(`- ${kleur.dim(path.join(project, properties.configFile))}`);
+		console.log(
+			`- ${kleur.dim(path.join(project, properties.configFile))}`,
+		);
 		console.log(`\nCopying files...`);
 	}
 	for (let [source, destination] of Object.entries({
@@ -135,7 +139,8 @@ export async function generateProject(answers, options) {
 			path.join(__dirname, '..', '/lib/files', source),
 			path.join(destination),
 		);
-		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
+		if (options.verbose)
+			console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
 
 	const templates = {
@@ -173,7 +178,8 @@ export async function generateProject(answers, options) {
 				runCmd: packageManager(options.install).run,
 			}),
 		);
-		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
+		if (options.verbose)
+			console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
 
 	const dependencies = ['@11ty/eleventy@' + options.set, 'rimraf'];

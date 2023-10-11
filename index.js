@@ -29,7 +29,11 @@ program
 	)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
-	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')
+	.option(
+		'-e, --set <version>',
+		'use a specific version of Eleventy',
+		'latest',
+	)
 	.addOption(
 		new Option(
 			'-i, --install <package-manager>',
@@ -146,9 +150,18 @@ if (
 				message: 'Set parent assets directory?',
 				default: 'assets',
 			}),
-			img: await input({ message: 'Set images directory?', default: 'img' }),
-			js: await input({ message: 'Set scripts directory?', default: 'js' }),
-			css: await input({ message: 'Set styles directory?', default: 'css' }),
+			img: await input({
+				message: 'Set images directory?',
+				default: 'img',
+			}),
+			js: await input({
+				message: 'Set scripts directory?',
+				default: 'js',
+			}),
+			css: await input({
+				message: 'Set styles directory?',
+				default: 'css',
+			}),
 		};
 	}
 }
