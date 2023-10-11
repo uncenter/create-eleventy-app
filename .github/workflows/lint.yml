@@ -1,0 +1,26 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, dev]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --dev
+
+      - name: Lint
+        run: pnpm lint
