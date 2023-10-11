@@ -28,7 +28,7 @@ async function createConfigFile({
 	let setup = new Set();
 	for (let addon of addons) {
 		const output = await addAddon(addon);
-		(output.imports || []).forEach((item) => imports.add(item));
+		for (const item of output.imports || []) imports.add(item);
 		setup.add(output.func);
 	}
 	imports = [...imports];
@@ -67,7 +67,7 @@ module.exports = function (eleventyConfig) {
 export async function generateProject(answers, options) {
 	const { project, filters, shortcodes, collections, properties, assets } =
 		answers;
-	const dirs = {
+	const directories = {
 		input: path.join(project, properties.input),
 		includes: path.join(project, properties.input, properties.includes),
 		data: path.join(project, properties.input, properties.data),
@@ -90,18 +90,18 @@ export async function generateProject(answers, options) {
 			'Something went wrong while creating the project directory.',
 		);
 	}
-	await fs.mkdir(dirs.input);
+	await fs.mkdir(directories.input);
 
 	if (options.verbose) {
 		console.log(`\nCreating some directories...`);
-		console.log(`- ${kleur.dim(dirs.input)}`);
+		console.log(`- ${kleur.dim(directories.input)}`);
 	}
 
-	for (const dir of Object.values(dirs).filter(
-		(dir) => dir !== dirs.output && dir !== dirs.input,
-	)) {
-		await fs.mkdir(dir, { recursive: true });
-		if (options.verbose) console.log(`- ${kleur.dim(dir)}`);
+	for (const directory of Object.values(directories)) {
+		if (directory === directories.output || directory === directories.input)
+			continue;
+		await fs.mkdir(directory, { recursive: true });
+		if (options.verbose) console.log(`- ${kleur.dim(directory)}`);
 	}
 
 	await fs.writeFile(
@@ -128,8 +128,8 @@ export async function generateProject(answers, options) {
 		console.log(`\nCopying files...`);
 	}
 	for (let [source, destination] of Object.entries({
-		'logo.png': path.join(dirs.img, 'logo.png'),
-		'style.css': path.join(dirs.css, 'style.css'),
+		'logo.png': path.join(directories.img, 'logo.png'),
+		'style.css': path.join(directories.css, 'style.css'),
 	})) {
 		await fs.copyFile(
 			path.join(__dirname, '..', '/lib/files', source),
@@ -141,23 +141,23 @@ export async function generateProject(answers, options) {
 	const templates = {
 		'gitignore.hbs': path.join(project, '.gitignore'),
 		'README.md.hbs': path.join(project, 'README.md'),
-		'index.md.hbs': path.join(dirs.input, 'index.md'),
-		'base.njk.hbs': path.join(dirs.includes, 'base.njk'),
+		'index.md.hbs': path.join(directories.input, 'index.md'),
+		'base.njk.hbs': path.join(directories.includes, 'base.njk'),
 		'package.json.hbs': path.join(project, 'package.json'),
-		'site.json.hbs': path.join(dirs.data, 'site.json'),
+		'site.json.hbs': path.join(directories.data, 'site.json'),
 	};
 	const compiledTemplates = {};
-	for (const [file, dest] of Object.entries(templates)) {
+	for (const [file, destination] of Object.entries(templates)) {
 		const templateSource = await fs.readFile(
 			path.join(__dirname, '..', 'lib', 'files', file),
 			'utf8',
 		);
-		compiledTemplates[dest] = handlebars.compile(templateSource);
+		compiledTemplates[destination] = handlebars.compile(templateSource);
 	}
 
-	for (const [dest, template] of Object.entries(compiledTemplates)) {
+	for (const [destination, template] of Object.entries(compiledTemplates)) {
 		await fs.writeFile(
-			path.join(dest),
+			path.join(destination),
 			template({
 				project,
 				input: properties.input,
@@ -173,7 +173,7 @@ export async function generateProject(answers, options) {
 				runCmd: packageManager(options.install).run,
 			}),
 		);
-		if (options.verbose) console.log(`- ${kleur.dim(path.join(dest))}`);
+		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
 
 	const dependencies = ['@11ty/eleventy@' + options.set, 'rimraf'];
@@ -209,5 +209,4 @@ ${kleur.blue('Next steps:')}
 ${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(
 		'Ctrl + C',
 	)} in your terminal.`);
-	process.exit(0);
 }
