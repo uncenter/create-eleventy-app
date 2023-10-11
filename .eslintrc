@@ -1,20 +1,17 @@
 {
-	"extends": ["eslint:recommended", "prettier"],
-	"parserOptions": {
-		"requireConfigFile": false,
-		"ecmaVersion": "latest",
-		"sourceType": "module"
+	"root": true,
+	"plugins": ["unicorn"],
+	"extends": ["eslint:recommended", "plugin:unicorn/recommended", "prettier"],
+	"rules": {
+		"unicorn/no-useless-undefined": ["error", { "checkArguments": false }],
+		"unicorn/text-encoding-identifier-case": 0,
+		"unicorn/prevent-abbreviations": [
+			"error",
+			{ "replacements": { "pkg": false } }
+		]
 	},
 	"env": {
 		"node": true,
 		"es2021": true
-	},
-	"overrides": [
-		{
-			"files": ["lib/addons/filters/*.js"],
-			"rules": {
-				"no-undef": "off"
-			}
-		}
-	]
+	}
 }
