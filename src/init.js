@@ -146,7 +146,7 @@ export async function generateProject(answers, options) {
 	const templates = {
 		'gitignore.hbs': path.join(project, '.gitignore'),
 		'README.md.hbs': path.join(project, 'README.md'),
-		'index.md.hbs': path.join(directories.input, 'index.md'),
+		'index.njk.hbs': path.join(directories.input, 'index.njk'),
 		'base.njk.hbs': path.join(directories.includes, 'base.njk'),
 		'package.json.hbs': path.join(project, 'package.json'),
 		'site.json.hbs': path.join(directories.data, 'site.json'),
