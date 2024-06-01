@@ -36,7 +36,7 @@
 	"devDependencies": {
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-unicorn": "^52.0.0"
+		"eslint-plugin-unicorn": "^53.0.0"
 	},
 	"packageManager": "pnpm@8.13.1+sha256.9e5f62ce5f2b7d4ceb3c2848f41cf0b33032c24d683c7088b53f62b1885fb246"
 }
