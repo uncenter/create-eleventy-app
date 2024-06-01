@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import path from 'node:path';
 
 import kebab from 'just-kebab-case';
 import semver from 'semver';
@@ -24,8 +24,9 @@ const __dirname = dirname(import.meta.url);
 const program = new Command();
 program
 	.version(
-		JSON.parse(await readFile(join(__dirname, 'package.json'), 'utf-8'))
-			.version,
+		JSON.parse(
+			await readFile(path.join(__dirname, 'package.json'), 'utf-8'),
+		).version,
 	)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
