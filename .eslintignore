@@ -1,1 +1,1 @@
-lib/addons/filters/*.js
+lib/addons/**/*.js
