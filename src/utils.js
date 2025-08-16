@@ -16,34 +16,11 @@ export async function alreadyExists(p) {
 	}
 }
 
-async function findFile(filename, parent) {
-	const files = await fs.readdir(parent);
-	for (let file of files) {
-		const stat = await fs.stat(path.join(parent, file));
-		if (stat.isDirectory()) {
-			const result = await findFile(filename, path.join(parent, file));
-			if (result) return result;
-		} else if (file === filename) {
-			return path.join(parent, file);
-		}
-	}
-	return false;
-}
-
 export async function addAddon(name) {
-	const file = await findFile(
-		name + '.js',
-		path.join(__dirname, '..', './lib/addons'),
-		'utf8',
-	);
-	let addon = await fs.readFile(file, 'utf-8');
-	const imports = addon.match(/const\s+.*\s*=\s*require\(["'].*["']\);/g);
-	if (imports) {
-		for (let imp of imports) {
-			addon = addon.replace(imp, '');
-		}
-	}
-	return { imports, func: addon };
+	const addonDirectory = path.join(__dirname, '..', `./lib/addons/${name}`);
+	let addonSource = await fs.readFile(path.join(addonDirectory, 'index.js'), 'utf-8');
+	let addonMeta = JSON.parse(await fs.readFile(path.join(addonDirectory, 'meta.json'), 'utf-8'));
+	return { meta: addonMeta, source: addonSource };
 }
 
 export async function queryPackage(pkg, version) {

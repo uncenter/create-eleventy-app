@@ -1,3 +1,5 @@
+// @ts-check
+
 import child_process from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -18,21 +20,27 @@ async function createConfigFile({
 	shortcodes,
 	collections,
 	assets,
-} = {}) {
+	isVersion3
+}) {
 	const addons = [
 		...(filters || []),
 		...(shortcodes || []),
 		...(collections || []),
 	];
-	let imports = new Set();
-	let setup = new Set();
+	const imports = new Map();
+	const setup = [];
 	for (let addon of addons) {
-		const output = await addAddon(addon);
-		for (const item of output.imports || []) imports.add(item);
-		setup.add(output.func);
+		const { meta, source } = await addAddon(addon);
+		for (const [specifier, modules] of meta.imports || []) {
+			if (!imports.has(specifier)) {
+				imports.set(specifier, new Set());
+			}
+			for (const module of modules) {
+				imports.get(specifier).add(module);
+			}
+		}
+		setup.push(source);
 	}
-	imports = [...imports];
-	setup = [...setup];
 
 	let passthroughCopy = [];
 	for (let asset of Object.values(assets).filter(
@@ -46,26 +54,42 @@ async function createConfigFile({
 	}
 
 	return `
-${imports.join('\n').concat('\n')}
+${[...imports.entries()]
+	.map(
+		([specifier, modules]) =>
+			properties.esModule ? `import { ${[...modules].join(', ')} } from '${specifier}';` : `const { ${[...modules].join(', ')} } = require('${specifier}');`,
+	)
+	.join('\n')}
 
-module.exports = function (eleventyConfig) {
-    ${setup.join('\n')}
+${properties.esModule ? 'export default' : 'module.exports ='} function (eleventyConfig) {
+	${setup.join('\n')}
 
-    ${passthroughCopy.join('\n')}
-
-    return {
-      dir: {
-        input: "${properties.input}",
-        includes: "${properties.includes}",
-        data: "${properties.data}",
-        output: "${properties.output}",
-      },
-    };
-  };`;
+	${passthroughCopy.join('\n')}
+${isVersion3 ? '' : `
+	return {
+		dir: {
+			input: "${properties.input}",
+			includes: "${properties.includes}",
+			data: "${properties.data}",
+			output: "${properties.output}",
+		},
+	};`}
+${properties.esModule ? `}` : `};`}
+${isVersion3 ? `
+${properties.esModule ? 'export const ' : 'module.exports.'}config = {
+	dir: {
+		input: "${properties.input}",
+		includes: "${properties.includes}",
+		data: "${properties.data}",
+		output: "${properties.output}",
+	},
+};
+` : ''}
+`;
 }
 
 export async function generateProject(answers, options) {
-	const { project, filters, shortcodes, collections, properties, assets } =
+	const { project, filters, shortcodes, collections, properties, assets, isVersion3 } =
 		answers;
 	const directories = {
 		input: path.join(project, properties.input),
@@ -115,6 +139,7 @@ export async function generateProject(answers, options) {
 				shortcodes,
 				collections,
 				assets,
+				isVersion3
 			}),
 			{
 				tabWidth: 2,
@@ -148,7 +173,6 @@ export async function generateProject(answers, options) {
 		'README.md.hbs': path.join(project, 'README.md'),
 		'index.njk.hbs': path.join(directories.input, 'index.njk'),
 		'base.njk.hbs': path.join(directories.includes, 'base.njk'),
-		'package.json.hbs': path.join(project, 'package.json'),
 		'site.json.hbs': path.join(directories.data, 'site.json'),
 	};
 	const compiledTemplates = {};
@@ -181,6 +205,26 @@ export async function generateProject(answers, options) {
 		if (options.verbose)
 			console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
+
+	const packageJsonPath = path.join(project, 'package.json');
+	await fs.writeFile(
+		packageJsonPath,
+		JSON.stringify(
+			{
+				name: project,
+				description: `A new Eleventy project created with create-eleventy-app.`,
+				type: properties.esModule ? 'module' : 'commonjs',
+				scripts: {
+					clean: `rimraf ${properties.output}`,
+					start: "eleventy --serve",
+					build: "eleventy"
+				}
+			},
+			undefined,
+			2,
+		),
+	);
+	if (options.verbose) console.log(`- ${kleur.dim(packageJsonPath)}`);
 
 	const dependencies = ['@11ty/eleventy@' + options.set, 'rimraf'];
 	const bar = new ProgressBar(':bar :percent', {

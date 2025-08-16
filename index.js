@@ -50,15 +50,19 @@ if (options.verbose && options.silent) {
 	log.error('You cannot use both --verbose and --silent.');
 	process.exit(1);
 }
-if (options.set !== 'latest' && options.set !== 'next') {
-	const data = await queryPackage('@11ty/eleventy');
-	if (!data.versions.includes(options.set)) {
-		log.error(
-			`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${data.version}).`,
-		);
-		process.exit(1);
-	}
+
+const npmPackage = await queryPackage('@11ty/eleventy');
+if (!npmPackage.versions.includes(options.set)) {
+	log.error(
+		`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${npmPackage.version}).`,
+	);
+	process.exit(1);
 }
+const resolvedVersion = options.set === 'latest' || options.set === 'next'
+	? npmPackage.version
+	: options.set;
+const isVersion2 = semver.gte(resolvedVersion, '2.0.0');
+const isVersion3 = isVersion2 && semver.gte(resolvedVersion, '3.0.0');
 
 const project = await input({
 	message: 'What is your project named?',
@@ -81,10 +85,9 @@ let customizations = {
 };
 
 let properties = {
+	esModule: isVersion3 ? true : false,
 	configFile:
-		options.set === 'latest' ||
-		options.set === 'next' ||
-		semver.gte(options.set, '2.0.0')
+		isVersion2
 			? 'eleventy.config.js'
 			: '.eleventy.js',
 	output: 'dist',
@@ -106,14 +109,21 @@ if (
 		default: false,
 	})
 ) {
+	const esModule = isVersion3 ? await confirm({
+			message: 'Use ECMAScript modules syntax (ESM) in JavaScript files?',
+			default: true,
+		}) : properties.esModule;
 	properties = {
-		configFile: await select({
-			message: 'Set Eleventy config file path?',
+		esModule,
+		configFile: isVersion2 ? await select({
+			message: 'Set Eleventy configuration file path?',
 			choices: [
 				{
 					value: 'eleventy.config.js',
 				},
-				{
+				esModule ? {
+					value: 'eleventy.config.mjs',
+				} : {
 					value: 'eleventy.config.cjs',
 				},
 				{
@@ -121,14 +131,7 @@ if (
 				},
 			],
 			default: properties.configFile,
-			when: () => {
-				return (
-					options.set === 'latest' ||
-					options.set === 'next' ||
-					semver.gte(options.set, '2.0.0')
-				);
-			},
-		}),
+		}) : '.eleventy.js',
 		output: await input({
 			message: 'Set output directory?',
 			default: 'dist',
@@ -172,5 +175,8 @@ const answers = {
 	...customizations,
 	properties: properties,
 	assets: assets,
+
+	isVersion2,
+	isVersion3,
 };
 await generateProject(answers, options);
