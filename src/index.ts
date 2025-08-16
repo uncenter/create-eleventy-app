@@ -10,14 +10,14 @@ import detectPackageManager from 'which-pm-runs';
 import { confirm, input, select } from '@inquirer/prompts';
 import { Command, Option } from 'commander';
 
-import { generateProject } from './src/init.js';
-import { alreadyExists, queryPackage } from './src/utils.js';
+import { generateProject } from './init.js';
+import { alreadyExists, queryPackage } from './utils.js';
 import {
 	dirname,
 	log,
 	packageManager,
 	packageManagers,
-} from './src/constants.js';
+} from './constants.js';
 
 const __dirname = dirname(import.meta.url);
 
