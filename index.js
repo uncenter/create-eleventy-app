@@ -52,17 +52,25 @@ if (options.verbose && options.silent) {
 }
 
 const npmPackage = await queryPackage('@11ty/eleventy');
-if (!npmPackage.versions.includes(options.set)) {
+const versionByDistributionTag = npmPackage.distributionTags[options.set];
+// If there is no version by the distribution tag, check if the version exists in the versions list.
+if (!versionByDistributionTag && !npmPackage.versions.includes(options.set)) {
 	log.error(
-		`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${npmPackage.version}).`,
+		`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${npmPackage.distributionTags['latest']}) or valid distribution tag (${Object.keys(npmPackage.distributionTags).join(', ')}).`,
 	);
 	process.exit(1);
 }
-const resolvedVersion = options.set === 'latest' || options.set === 'next'
-	? npmPackage.version
-	: options.set;
-const isVersion2 = semver.gte(resolvedVersion, '2.0.0');
-const isVersion3 = isVersion2 && semver.gte(resolvedVersion, '3.0.0');
+const resolvedVersion = versionByDistributionTag || options.set;
+const supportsVersion2 = semver.gte(resolvedVersion, '2.0.0');
+const supportsVersion3 = supportsVersion2 && semver.gte(resolvedVersion, '3.0.0');
+const isTooNew = supportsVersion3 && semver.major(resolvedVersion) > 3;
+
+if (isTooNew) {
+	log.error(
+		`The version of Eleventy you are trying to use (${resolvedVersion}) is too new for this version of create-eleventy-app. Please update create-eleventy-app or open an issue at https://github.com/uncenter/create-eleventy-app/issues.`,
+	);
+	process.exit(1);
+}
 
 const project = await input({
 	message: 'What is your project named?',
@@ -85,9 +93,9 @@ let customizations = {
 };
 
 let properties = {
-	esModule: isVersion3 ? true : false,
+	esModule: supportsVersion3 ? true : false,
 	configFile:
-		isVersion2
+		supportsVersion2
 			? 'eleventy.config.js'
 			: '.eleventy.js',
 	output: 'dist',
@@ -109,13 +117,13 @@ if (
 		default: false,
 	})
 ) {
-	const esModule = isVersion3 ? await confirm({
+	const esModule = supportsVersion3 ? await confirm({
 			message: 'Use ECMAScript modules syntax (ESM) in JavaScript files?',
 			default: true,
 		}) : properties.esModule;
 	properties = {
 		esModule,
-		configFile: isVersion2 ? await select({
+		configFile: supportsVersion2 ? await select({
 			message: 'Set Eleventy configuration file path?',
 			choices: [
 				{
@@ -176,7 +184,7 @@ const answers = {
 	properties: properties,
 	assets: assets,
 
-	isVersion2,
-	isVersion3,
+	supportsVersion2,
+	supportsVersion3,
 };
 await generateProject(answers, options);

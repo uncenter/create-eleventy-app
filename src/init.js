@@ -20,7 +20,7 @@ async function createConfigFile({
 	shortcodes,
 	collections,
 	assets,
-	isVersion3
+	supportsVersion3
 }) {
 	const addons = [
 		...(filters || []),
@@ -65,7 +65,7 @@ ${properties.esModule ? 'export default' : 'module.exports ='} function (elevent
 	${setup.join('\n')}
 
 	${passthroughCopy.join('\n')}
-${isVersion3 ? '' : `
+${supportsVersion3 ? '' : `
 	return {
 		dir: {
 			input: "${properties.input}",
@@ -75,7 +75,7 @@ ${isVersion3 ? '' : `
 		},
 	};`}
 ${properties.esModule ? `}` : `};`}
-${isVersion3 ? `
+${supportsVersion3 ? `
 ${properties.esModule ? 'export const ' : 'module.exports.'}config = {
 	dir: {
 		input: "${properties.input}",
@@ -89,7 +89,7 @@ ${properties.esModule ? 'export const ' : 'module.exports.'}config = {
 }
 
 export async function generateProject(answers, options) {
-	const { project, filters, shortcodes, collections, properties, assets, isVersion3 } =
+	const { project, filters, shortcodes, collections, properties, assets, supportsVersion3 } =
 		answers;
 	const directories = {
 		input: path.join(project, properties.input),
@@ -139,7 +139,7 @@ export async function generateProject(answers, options) {
 				shortcodes,
 				collections,
 				assets,
-				isVersion3
+				supportsVersion3
 			}),
 			{
 				tabWidth: 2,

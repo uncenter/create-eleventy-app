@@ -27,11 +27,11 @@ export async function queryPackage(pkg, version) {
 	const response = await fetch(
 		`https://registry.npmjs.org/${pkg}${version ? '/' + version : ''}`,
 	);
-	const { name, description, versions } = await response.json();
+	const { name, description, versions, 'dist-tags': distributionTags } = await response.json();
 	return {
-		name: name,
-		description: description,
-		version: Object.keys(versions).at(-1),
+		name,
+		description,
 		versions: Object.keys(versions),
+		distributionTags,
 	};
 }
