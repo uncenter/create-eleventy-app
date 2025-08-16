@@ -50,14 +50,26 @@ if (options.verbose && options.silent) {
 	log.error('You cannot use both --verbose and --silent.');
 	process.exit(1);
 }
-if (options.set !== 'latest' && options.set !== 'next') {
-	const data = await queryPackage('@11ty/eleventy');
-	if (!data.versions.includes(options.set)) {
-		log.error(
-			`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${data.version}).`,
-		);
-		process.exit(1);
-	}
+
+const npmPackage = await queryPackage('@11ty/eleventy');
+const versionByDistributionTag = npmPackage.distributionTags[options.set];
+// If there is no version by the distribution tag, check if the version exists in the versions list.
+if (!versionByDistributionTag && !npmPackage.versions.includes(options.set)) {
+	log.error(
+		`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${npmPackage.distributionTags['latest']}) or valid distribution tag (${Object.keys(npmPackage.distributionTags).join(', ')}).`,
+	);
+	process.exit(1);
+}
+const resolvedVersion = versionByDistributionTag || options.set;
+const supportsVersion2 = semver.gte(resolvedVersion, '2.0.0');
+const supportsVersion3 = supportsVersion2 && semver.gte(resolvedVersion, '3.0.0');
+const isTooNew = supportsVersion3 && semver.major(resolvedVersion) > 3;
+
+if (isTooNew) {
+	log.error(
+		`The version of Eleventy you are trying to use (${resolvedVersion}) is too new for this version of create-eleventy-app. Please update create-eleventy-app or open an issue at https://github.com/uncenter/create-eleventy-app/issues.`,
+	);
+	process.exit(1);
 }
 
 const project = await input({
@@ -81,10 +93,9 @@ let customizations = {
 };
 
 let properties = {
+	esModule: supportsVersion3 ? true : false,
 	configFile:
-		options.set === 'latest' ||
-		options.set === 'next' ||
-		semver.gte(options.set, '2.0.0')
+		supportsVersion2
 			? 'eleventy.config.js'
 			: '.eleventy.js',
 	output: 'dist',
@@ -106,14 +117,21 @@ if (
 		default: false,
 	})
 ) {
+	const esModule = supportsVersion3 ? await confirm({
+			message: 'Use ECMAScript modules syntax (ESM) in JavaScript files?',
+			default: true,
+		}) : properties.esModule;
 	properties = {
-		configFile: await select({
-			message: 'Set Eleventy config file path?',
+		esModule,
+		configFile: supportsVersion2 ? await select({
+			message: 'Set Eleventy configuration file path?',
 			choices: [
 				{
 					value: 'eleventy.config.js',
 				},
-				{
+				esModule ? {
+					value: 'eleventy.config.mjs',
+				} : {
 					value: 'eleventy.config.cjs',
 				},
 				{
@@ -121,14 +139,7 @@ if (
 				},
 			],
 			default: properties.configFile,
-			when: () => {
-				return (
-					options.set === 'latest' ||
-					options.set === 'next' ||
-					semver.gte(options.set, '2.0.0')
-				);
-			},
-		}),
+		}) : '.eleventy.js',
 		output: await input({
 			message: 'Set output directory?',
 			default: 'dist',
@@ -172,5 +183,8 @@ const answers = {
 	...customizations,
 	properties: properties,
 	assets: assets,
+
+	supportsVersion2,
+	supportsVersion3,
 };
 await generateProject(answers, options);
