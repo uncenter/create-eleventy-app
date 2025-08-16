@@ -19,15 +19,11 @@ import {
 	packageManagers,
 } from './constants.js';
 
-const __dirname = dirname(import.meta.url);
+import * as packageJson from '../package.json' with { type: 'json' };
 
 const program = new Command();
 program
-	.version(
-		JSON.parse(
-			await readFile(path.join(__dirname, 'package.json'), 'utf-8'),
-		).version,
-	)
+	.version(packageJson.version)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option(
