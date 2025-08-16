@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-
 import kebab from 'just-kebab-case';
 import semver from 'semver';
 import detectPackageManager from 'which-pm-runs';
@@ -10,24 +7,19 @@ import detectPackageManager from 'which-pm-runs';
 import { confirm, input, select } from '@inquirer/prompts';
 import { Command, Option } from 'commander';
 
-import { generateProject } from './src/init.js';
-import { alreadyExists, queryPackage } from './src/utils.js';
+import { generateProject } from './init.js';
+import { alreadyExists, queryPackage } from './utils.js';
 import {
-	dirname,
 	log,
-	packageManager,
-	packageManagers,
-} from './src/constants.js';
+	getPackageManager,
+	PACKAGE_MANAGERS,
+} from './constants.js';
 
-const __dirname = dirname(import.meta.url);
+import * as packageJson from '../package.json' with { type: 'json' };
 
 const program = new Command();
 program
-	.version(
-		JSON.parse(
-			await readFile(path.join(__dirname, 'package.json'), 'utf-8'),
-		).version,
-	)
+	.version(packageJson.version)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
 	.option(
@@ -40,8 +32,8 @@ program
 			'-i, --install <package-manager>',
 			'install dependencies using specified package manager',
 		)
-			.choices(packageManagers)
-			.default(detectPackageManager()?.name || packageManager().name),
+			.choices(PACKAGE_MANAGERS)
+			.default(detectPackageManager()?.name || getPackageManager().name),
 	);
 
 program.parse(process.argv);

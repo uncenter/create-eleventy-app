@@ -9,13 +9,11 @@
 		"LICENSE",
 		"README.md",
 		"lib/",
-		"src/",
-		"index.js"
+		"dist/"
 	],
 	"type": "module",
-	"exports": "./index.js",
 	"bin": {
-		"create-eleventy-app": "./index.js"
+		"create-eleventy-app": "./dist/index.js"
 	},
 	"scripts": {
 		"lint": "eslint .",
@@ -34,9 +32,12 @@
 		"which-pm-runs": "^1.1.0"
 	},
 	"devDependencies": {
+		"@types/semver": "^7.7.0",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-unicorn": "^53.0.0"
+		"eslint-plugin-unicorn": "^53.0.0",
+		"tsdown": "^0.14.1",
+		"typescript": "^5.9.2"
 	},
 	"packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }

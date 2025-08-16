@@ -1,5 +1,3 @@
-// @ts-check
-
 import child_process from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -9,7 +7,7 @@ import kleur from 'kleur';
 import prettier from 'prettier';
 import ProgressBar from 'progress';
 
-import { dirname, packageManager } from './constants.js';
+import { dirname, getPackageManager } from './constants.js';
 import { addAddon } from './utils.js';
 
 const __dirname = dirname(import.meta.url);
@@ -199,7 +197,7 @@ export async function generateProject(answers, options) {
 				configFile: properties.configFile,
 				includes: properties.includes,
 				data: properties.data,
-				runCmd: packageManager(options.install).run,
+				runCmd: getPackageManager(options.install).run,
 			}),
 		);
 		if (options.verbose)
@@ -242,7 +240,7 @@ export async function generateProject(answers, options) {
 	for (let dependency of dependencies) {
 		child_process.execSync(
 			`cd ${project} && ${
-				packageManager(options.install).install
+				getPackageManager(options.install).install
 			} ${dependency}`,
 		);
 		bar.tick();
@@ -253,7 +251,7 @@ ${kleur.green('✓ Success!')} Created ${kleur.bold(project)}.
 ${kleur.blue('Next steps:')}
 
 - ${kleur.bold('cd ' + project)}
-- ${kleur.bold(packageManager(options.install).run + ' start')}
+- ${kleur.bold(getPackageManager(options.install).run + ' start')}
 - ${kleur.underline('https://www.11ty.dev/docs/')}
 
 ${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(
