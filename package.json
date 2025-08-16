@@ -34,6 +34,7 @@
 		"which-pm-runs": "^1.1.0"
 	},
 	"devDependencies": {
+		"@types/semver": "^7.7.0",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-unicorn": "^53.0.0",

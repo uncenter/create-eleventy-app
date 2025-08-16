@@ -1,11 +1,13 @@
 import { fileURLToPath } from 'node:url';
-export const dirname = (x) => fileURLToPath(new URL('.', x));
+export const dirname = (x: string) => fileURLToPath(new URL('.', x));
 
 import { Logger } from 'loogu';
 export const log = new Logger('', { throwError: false });
 
-export const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'];
-export const packageManager = (pm) => {
+export const PACKAGE_MANAGERS = ['npm', 'yarn', 'pnpm', 'bun'] as const;
+export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
+
+export const getPackageManager = (pm?: PackageManager) => {
 	switch (pm) {
 		case 'yarn': {
 			return {

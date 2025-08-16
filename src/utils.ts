@@ -5,7 +5,7 @@ import { dirname } from './constants.js';
 
 const __dirname = dirname(import.meta.url);
 
-export async function alreadyExists(p) {
+export async function alreadyExists(p: string): Promise<boolean> {
 	try {
 		const stats = await fs.stat(p);
 		if (stats.isFile()) return true;
@@ -16,14 +16,14 @@ export async function alreadyExists(p) {
 	}
 }
 
-export async function addAddon(name) {
+export async function addAddon(name: string): Promise<{ meta: { imports: [string, Array<string>] }; source: string }> {
 	const addonDirectory = path.join(__dirname, '..', `./lib/addons/${name}`);
 	let addonSource = await fs.readFile(path.join(addonDirectory, 'index.js'), 'utf-8');
 	let addonMeta = JSON.parse(await fs.readFile(path.join(addonDirectory, 'meta.json'), 'utf-8'));
 	return { meta: addonMeta, source: addonSource };
 }
 
-export async function queryPackage(pkg, version) {
+export async function queryPackage(pkg: string, version?: string) {
 	const response = await fetch(
 		`https://registry.npmjs.org/${pkg}${version ? '/' + version : ''}`,
 	);

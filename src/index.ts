@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-
 import kebab from 'just-kebab-case';
 import semver from 'semver';
 import detectPackageManager from 'which-pm-runs';
@@ -13,10 +10,9 @@ import { Command, Option } from 'commander';
 import { generateProject } from './init.js';
 import { alreadyExists, queryPackage } from './utils.js';
 import {
-	dirname,
 	log,
-	packageManager,
-	packageManagers,
+	getPackageManager,
+	PACKAGE_MANAGERS,
 } from './constants.js';
 
 import * as packageJson from '../package.json' with { type: 'json' };
@@ -36,8 +32,8 @@ program
 			'-i, --install <package-manager>',
 			'install dependencies using specified package manager',
 		)
-			.choices(packageManagers)
-			.default(detectPackageManager()?.name || packageManager().name),
+			.choices(PACKAGE_MANAGERS)
+			.default(detectPackageManager()?.name || getPackageManager().name),
 	);
 
 program.parse(process.argv);
