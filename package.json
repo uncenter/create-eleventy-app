@@ -9,13 +9,11 @@
 		"LICENSE",
 		"README.md",
 		"lib/",
-		"src/",
-		"index.js"
+		"dist/"
 	],
 	"type": "module",
-	"exports": "./index.js",
 	"bin": {
-		"create-eleventy-app": "./index.js"
+		"create-eleventy-app": "./dist/index.js"
 	},
 	"scripts": {
 		"lint": "eslint .",
