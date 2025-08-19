@@ -28,7 +28,7 @@
 		"loogu": "^0.4.0",
 		"prettier": "^3.3.0",
 		"progress": "^2.0.3",
-		"semver": "^7.6.2",
+		"semver": "^7.7.2",
 		"which-pm-runs": "^1.1.0"
 	},
 	"devDependencies": {
