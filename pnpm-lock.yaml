@@ -12,7 +12,7 @@ importers:
         specifier: ^3.3.0
         version: 3.3.2
       commander:
-        specifier: ^11.0.0
+        specifier: ^11.1.0
         version: 11.1.0
       handlebars:
         specifier: ^4.7.8
