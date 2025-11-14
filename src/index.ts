@@ -1,32 +1,22 @@
 #!/usr/bin/env node
 
-import kebab from 'just-kebab-case';
-import semver from 'semver';
-import detectPackageManager from 'which-pm-runs';
+import * as packageJson from '../package.json' with { type: 'json' };
+import { getPackageManager, log, PACKAGE_MANAGERS } from './constants.js';
+import { generateProject } from './init.js';
+import { alreadyExists, queryPackage } from './utils.js';
 
 import { confirm, input, select } from '@inquirer/prompts';
 import { Command, Option } from 'commander';
-
-import { generateProject } from './init.js';
-import { alreadyExists, queryPackage } from './utils.js';
-import {
-	log,
-	getPackageManager,
-	PACKAGE_MANAGERS,
-} from './constants.js';
-
-import * as packageJson from '../package.json' with { type: 'json' };
+import kebab from 'just-kebab-case';
+import semver from 'semver';
+import detectPackageManager from 'which-pm-runs';
 
 const program = new Command();
 program
 	.version(packageJson.version)
 	.option('-v, --verbose', 'print verbose output', false)
 	.option('-s, --silent', 'silence all output', false)
-	.option(
-		'-e, --set <version>',
-		'use a specific version of Eleventy',
-		'latest',
-	)
+	.option('-e, --set <version>', 'use a specific version of Eleventy', 'latest')
 	.addOption(
 		new Option(
 			'-i, --install <package-manager>',
@@ -37,7 +27,7 @@ program
 	);
 
 program.parse(process.argv);
-let options = program.opts();
+const options = program.opts();
 if (options.verbose && options.silent) {
 	log.error('You cannot use both --verbose and --silent.');
 	process.exit(1);
@@ -46,9 +36,9 @@ if (options.verbose && options.silent) {
 const npmPackage = await queryPackage('@11ty/eleventy');
 const versionByDistributionTag = npmPackage.distributionTags[options.set];
 // If there is no version by the distribution tag, check if the version exists in the versions list.
-if (!versionByDistributionTag && !npmPackage.versions.includes(options.set)) {
+if (!(versionByDistributionTag || npmPackage.versions.includes(options.set))) {
 	log.error(
-		`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${npmPackage.distributionTags['latest']}) or valid distribution tag (${Object.keys(npmPackage.distributionTags).join(', ')}).`,
+		`@11ty/eleventy@${options.set} does not exist. Please use a valid version number (latest: ${npmPackage.distributionTags.latest}) or valid distribution tag (${Object.keys(npmPackage.distributionTags).join(', ')}).`,
 	);
 	process.exit(1);
 }
@@ -78,18 +68,15 @@ const project = await input({
 	},
 });
 
-let customizations = {
+const customizations = {
 	filters: ['htmlDateString', 'readableDate'],
 	shortcodes: [],
 	collections: [],
 };
 
 let properties = {
-	esModule: supportsVersion3 ? true : false,
-	configFile:
-		supportsVersion2
-			? 'eleventy.config.js'
-			: '.eleventy.js',
+	esModule: supportsVersion3,
+	configFile: supportsVersion2 ? 'eleventy.config.js' : '.eleventy.js',
 	output: 'dist',
 	input: 'src',
 	data: '_data',
@@ -109,29 +96,35 @@ if (
 		default: false,
 	})
 ) {
-	const esModule = supportsVersion3 ? await confirm({
-			message: 'Use ECMAScript modules syntax (ESM) in JavaScript files?',
-			default: true,
-		}) : properties.esModule;
+	const esModule = supportsVersion3
+		? await confirm({
+				message: 'Use ECMAScript modules syntax (ESM) in JavaScript files?',
+				default: true,
+			})
+		: properties.esModule;
 	properties = {
 		esModule,
-		configFile: supportsVersion2 ? await select({
-			message: 'Set Eleventy configuration file path?',
-			choices: [
-				{
-					value: 'eleventy.config.js',
-				},
-				esModule ? {
-					value: 'eleventy.config.mjs',
-				} : {
-					value: 'eleventy.config.cjs',
-				},
-				{
-					value: '.eleventy.js',
-				},
-			],
-			default: properties.configFile,
-		}) : '.eleventy.js',
+		configFile: supportsVersion2
+			? await select({
+					message: 'Set Eleventy configuration file path?',
+					choices: [
+						{
+							value: 'eleventy.config.js',
+						},
+						esModule
+							? {
+									value: 'eleventy.config.mjs',
+								}
+							: {
+									value: 'eleventy.config.cjs',
+								},
+						{
+							value: '.eleventy.js',
+						},
+					],
+					default: properties.configFile,
+				})
+			: '.eleventy.js',
 		output: await input({
 			message: 'Set output directory?',
 			default: 'dist',

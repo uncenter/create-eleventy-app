@@ -1,14 +1,13 @@
+import { dirname, getPackageManager } from './constants.js';
+import { addAddon } from './utils.js';
+
 import child_process from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
 import handlebars from 'handlebars';
 import kleur from 'kleur';
 import prettier from 'prettier';
 import ProgressBar from 'progress';
-
-import { dirname, getPackageManager } from './constants.js';
-import { addAddon } from './utils.js';
 
 const __dirname = dirname(import.meta.url);
 
@@ -18,16 +17,12 @@ async function createConfigFile({
 	shortcodes,
 	collections,
 	assets,
-	supportsVersion3
+	supportsVersion3,
 }) {
-	const addons = [
-		...(filters || []),
-		...(shortcodes || []),
-		...(collections || []),
-	];
+	const addons = [...(filters || []), ...(shortcodes || []), ...(collections || [])];
 	const imports = new Map();
 	const setup = [];
-	for (let addon of addons) {
+	for (const addon of addons) {
 		const { meta, source } = await addAddon(addon);
 		for (const [specifier, modules] of meta.imports || []) {
 			if (!imports.has(specifier)) {
@@ -40,10 +35,8 @@ async function createConfigFile({
 		setup.push(source);
 	}
 
-	let passthroughCopy = [];
-	for (let asset of Object.values(assets).filter(
-		(asset) => assets.parent !== asset,
-	)) {
+	const passthroughCopy = [];
+	for (const asset of Object.values(assets).filter((asset) => assets.parent !== asset)) {
 		passthroughCopy.push(
 			`eleventyConfig.addPassthroughCopy(${JSON.stringify(
 				path.join(properties.input, assets.parent, asset),
@@ -53,9 +46,10 @@ async function createConfigFile({
 
 	return `
 ${[...imports.entries()]
-	.map(
-		([specifier, modules]) =>
-			properties.esModule ? `import { ${[...modules].join(', ')} } from '${specifier}';` : `const { ${[...modules].join(', ')} } = require('${specifier}');`,
+	.map(([specifier, modules]) =>
+		properties.esModule
+			? `import { ${[...modules].join(', ')} } from '${specifier}';`
+			: `const { ${[...modules].join(', ')} } = require('${specifier}');`,
 	)
 	.join('\n')}
 
@@ -63,7 +57,10 @@ ${properties.esModule ? 'export default' : 'module.exports ='} function (elevent
 	${setup.join('\n')}
 
 	${passthroughCopy.join('\n')}
-${supportsVersion3 ? '' : `
+${
+	supportsVersion3
+		? ''
+		: `
 	return {
 		dir: {
 			input: "${properties.input}",
@@ -71,9 +68,12 @@ ${supportsVersion3 ? '' : `
 			data: "${properties.data}",
 			output: "${properties.output}",
 		},
-	};`}
+	};`
+}
 ${properties.esModule ? `}` : `};`}
-${supportsVersion3 ? `
+${
+	supportsVersion3
+		? `
 ${properties.esModule ? 'export const ' : 'module.exports.'}config = {
 	dir: {
 		input: "${properties.input}",
@@ -82,7 +82,9 @@ ${properties.esModule ? 'export const ' : 'module.exports.'}config = {
 		output: "${properties.output}",
 	},
 };
-` : ''}
+`
+		: ''
+}
 `;
 }
 
@@ -102,17 +104,11 @@ export async function generateProject(answers, options) {
 	const restoreLog = console.log;
 	console.log = options.silent ? () => {} : console.log;
 
-	console.log(
-		`\nCreating a new Eleventy site in ${kleur.blue(
-			path.resolve(project),
-		)}.`,
-	);
+	console.log(`\nCreating a new Eleventy site in ${kleur.blue(path.resolve(project))}.`);
 	try {
 		await fs.mkdir(project, { recursive: true });
 	} catch {
-		throw new Error(
-			'Something went wrong while creating the project directory.',
-		);
+		throw new Error('Something went wrong while creating the project directory.');
 	}
 	await fs.mkdir(directories.input);
 
@@ -122,8 +118,7 @@ export async function generateProject(answers, options) {
 	}
 
 	for (const directory of Object.values(directories)) {
-		if (directory === directories.output || directory === directories.input)
-			continue;
+		if (directory === directories.output || directory === directories.input) continue;
 		await fs.mkdir(directory, { recursive: true });
 		if (options.verbose) console.log(`- ${kleur.dim(directory)}`);
 	}
@@ -137,7 +132,7 @@ export async function generateProject(answers, options) {
 				shortcodes,
 				collections,
 				assets,
-				supportsVersion3
+				supportsVersion3,
 			}),
 			{
 				tabWidth: 2,
@@ -149,21 +144,15 @@ export async function generateProject(answers, options) {
 		),
 	);
 	if (options.verbose) {
-		console.log(
-			`- ${kleur.dim(path.join(project, properties.configFile))}`,
-		);
+		console.log(`- ${kleur.dim(path.join(project, properties.configFile))}`);
 		console.log(`\nCopying files...`);
 	}
-	for (let [source, destination] of Object.entries({
+	for (const [source, destination] of Object.entries({
 		'logo.png': path.join(directories.img, 'logo.png'),
 		'style.css': path.join(directories.css, 'style.css'),
 	})) {
-		await fs.copyFile(
-			path.join(__dirname, '..', '/lib/files', source),
-			path.join(destination),
-		);
-		if (options.verbose)
-			console.log(`- ${kleur.dim(path.join(destination))}`);
+		await fs.copyFile(path.join(__dirname, '..', '/lib/files', source), path.join(destination));
+		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
 
 	const templates = {
@@ -200,8 +189,7 @@ export async function generateProject(answers, options) {
 				runCmd: getPackageManager(options.install).run,
 			}),
 		);
-		if (options.verbose)
-			console.log(`- ${kleur.dim(path.join(destination))}`);
+		if (options.verbose) console.log(`- ${kleur.dim(path.join(destination))}`);
 	}
 
 	const packageJsonPath = path.join(project, 'package.json');
@@ -214,9 +202,9 @@ export async function generateProject(answers, options) {
 				type: properties.esModule ? 'module' : 'commonjs',
 				scripts: {
 					clean: `rimraf ${properties.output}`,
-					start: "eleventy --serve",
-					build: "eleventy"
-				}
+					start: 'eleventy --serve',
+					build: 'eleventy',
+				},
 			},
 			undefined,
 			2,
@@ -224,7 +212,7 @@ export async function generateProject(answers, options) {
 	);
 	if (options.verbose) console.log(`- ${kleur.dim(packageJsonPath)}`);
 
-	const dependencies = ['@11ty/eleventy@' + options.set, 'rimraf'];
+	const dependencies = [`@11ty/eleventy@${options.set}`, 'rimraf'];
 	const bar = new ProgressBar(':bar :percent', {
 		complete: '▓',
 		incomplete: '░',
@@ -237,11 +225,9 @@ export async function generateProject(answers, options) {
 		)}):\n - ${kleur.cyan(dependencies.join('\n - '))}\n`,
 	);
 	console.log = restoreLog;
-	for (let dependency of dependencies) {
+	for (const dependency of dependencies) {
 		child_process.execSync(
-			`cd ${project} && ${
-				getPackageManager(options.install).install
-			} ${dependency}`,
+			`cd ${project} && ${getPackageManager(options.install).install} ${dependency}`,
 		);
 		bar.tick();
 	}
@@ -250,8 +236,8 @@ ${kleur.green('✓ Success!')} Created ${kleur.bold(project)}.
 
 ${kleur.blue('Next steps:')}
 
-- ${kleur.bold('cd ' + project)}
-- ${kleur.bold(getPackageManager(options.install).run + ' start')}
+- ${kleur.bold(`cd ${project}`)}
+- ${kleur.bold(`${getPackageManager(options.install).run} start`)}
 - ${kleur.underline('https://www.11ty.dev/docs/')}
 
 ${kleur.yellow('Note:')} To close the dev server, press ${kleur.bold(
