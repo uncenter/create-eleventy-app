@@ -27,8 +27,8 @@ importers:
         specifier: ^0.4.0
         version: 0.4.0
       prettier:
-        specifier: ^3.3.0
-        version: 3.3.0
+        specifier: ^3.6.2
+        version: 3.6.2
       progress:
         specifier: ^2.0.3
         version: 2.0.3
@@ -483,8 +483,8 @@ packages:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
 
-  prettier@3.3.0:
-    resolution: {integrity: sha512-J9odKxERhCQ10OC2yb93583f6UnYutOeiV5i0zEDS7UGTdUt0u+y8erxl3lBKvwo/JHyyoEdXjwp4dke9oyZ/g==}
+  prettier@3.6.2:
+    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1006,7 +1006,7 @@ snapshots:
 
   picomatch@4.0.3: {}
 
-  prettier@3.3.0: {}
+  prettier@3.6.2: {}
 
   progress@2.0.3: {}
 
