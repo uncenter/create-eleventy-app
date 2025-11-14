@@ -16,8 +16,8 @@
 		"create-eleventy-app": "./dist/index.js"
 	},
 	"scripts": {
-		"lint": "eslint .",
-		"format": "prettier --write ."
+		"lint": "biome check .",
+		"format": "biome format --write ."
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^3.3.0",
@@ -32,10 +32,8 @@
 		"which-pm-runs": "^1.1.0"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.3.5",
 		"@types/semver": "^7.7.0",
-		"eslint": "^8.56.0",
-		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-unicorn": "^53.0.0",
 		"tsdown": "^0.14.1",
 		"typescript": "^5.9.2"
 	},
