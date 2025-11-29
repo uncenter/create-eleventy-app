@@ -1,6 +1,6 @@
 {
 	"name": "create-eleventy-app",
-	"version": "1.9.0",
+	"version": "1.10.0",
 	"description": "An interactive CLI to create a fresh Eleventy project.",
 	"author": "uncenter <hi@uncenter.dev>",
 	"repository": "uncenter/create-eleventy-app",
