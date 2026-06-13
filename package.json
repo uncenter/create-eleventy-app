@@ -20,7 +20,7 @@
 		"format": "biome format --write ."
 	},
 	"dependencies": {
-		"@inquirer/prompts": "^3.3.0",
+		"@inquirer/prompts": "^3.3.2",
 		"commander": "^11.0.0",
 		"handlebars": "^4.7.8",
 		"just-kebab-case": "^4.2.0",
