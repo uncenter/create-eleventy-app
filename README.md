@@ -1,3 +1,10 @@
+<div align="center">
+	<h1>🚧 ARCHIVED 🚧</h1>
+	<h3>This project is no longer developed and may not work with the latest version of Eleventy.</h3>
+</div>
+
+---
+
 # create-eleventy-app
 
 A simple CLI for creating an Eleventy project in seconds.
